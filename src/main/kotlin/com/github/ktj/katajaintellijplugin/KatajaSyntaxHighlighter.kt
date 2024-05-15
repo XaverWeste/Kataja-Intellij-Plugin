@@ -6,6 +6,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 
 class KatajaSyntaxHighlighter : SyntaxHighlighterBase() {
+
     override fun getHighlightingLexer(): Lexer {
         TODO("Not yet implemented")
     }
