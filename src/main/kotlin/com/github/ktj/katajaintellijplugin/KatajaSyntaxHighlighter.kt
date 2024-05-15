@@ -7,9 +7,7 @@ import com.intellij.psi.tree.IElementType
 
 class KatajaSyntaxHighlighter : SyntaxHighlighterBase() {
 
-    override fun getHighlightingLexer(): Lexer {
-        TODO("Not yet implemented")
-    }
+    override fun getHighlightingLexer(): Lexer = KatajaLexer()
 
     override fun getTokenHighlights(element: IElementType?): Array<TextAttributesKey> {
         TODO("Not yet implemented")

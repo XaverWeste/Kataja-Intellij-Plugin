@@ -7,7 +7,5 @@ import com.intellij.openapi.vfs.VirtualFile
 
 class KatajaSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
 
-    override fun getSyntaxHighlighter(project: Project?, file: VirtualFile?): SyntaxHighlighter {
-        TODO("Not yet implemented")
-    }
+    override fun getSyntaxHighlighter(project: Project?, file: VirtualFile?): SyntaxHighlighter = KatajaSyntaxHighlighter()
 }
