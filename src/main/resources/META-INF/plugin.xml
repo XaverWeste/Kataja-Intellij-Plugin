@@ -31,5 +31,7 @@
         <lang.syntaxHighlighterFactory
                 language="Kataja"
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaSyntaxHighlighterFactory"/>
+        <colorSettingsPage
+                implementation="com.github.ktj.katajaintellijplugin.KatajaColorSettingsPage"/>
     </extensions>
 </idea-plugin>

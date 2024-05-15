@@ -84,6 +84,7 @@ class KatajaLexer: Lexer() {
                 while(pos < end && buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)) pos++
 
                 if(pos < end && buffer[pos + 1] == '.'){
+                    pos++
                     while(pos < end && buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)) pos++
 
                     if(pos < end && setOf('i', 'd', 'l', 's', 'f').contains(buffer[pos + 1])) pos++
@@ -92,12 +93,10 @@ class KatajaLexer: Lexer() {
                 state = 3
                 while(pos < end && setOf('+', '-', '*', '/', '^', '!', '%', '&', '=', '|', '<', '>', '~', '\\').contains(buffer[pos + 1])) pos++
             }else if((current > ('a' - 1) && current < ('z' + 1)) || (current > ('A' - 1) && current < ('Z' + 1))){
-                val identifierStart: Int = pos
                 state = 1
                 while(pos < end && ((buffer[pos + 1] == '_') || (buffer[pos + 1] > ('a' - 1) && buffer[pos + 1] < ('z' + 1)) || (buffer[pos + 1] > ('A' - 1) && buffer[pos + 1] < ('Z' + 1)) || (buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)))) pos++
 
-                if(setOf("if", "else", "while", "for", "public", "private", "protected", "class", "data", "type", "return", "this", "null", "int", "double", "float", "short", "long", "boolean", "final", "const", "extends", "synchronised", "char").contains(buffer.subSequence(identifierStart, pos + 1))) state = 5
-                println(buffer.subSequence(identifierStart, pos + 1))
+                if(setOf("if", "else", "while", "for", "public", "private", "protected", "class", "data", "type", "return", "this", "null", "int", "double", "float", "short", "long", "boolean", "final", "const", "extends", "synchronised", "char").contains(buffer.subSequence(startToken, pos + 1).toString())) state = 5
             }else state = 2
 
             endToken = pos
