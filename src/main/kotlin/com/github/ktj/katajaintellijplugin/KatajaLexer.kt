@@ -8,48 +8,72 @@ class KatajaLexer: Lexer() {
     
     private lateinit var buffer: CharSequence
     private var state = 0
-    private var pos: Int = -1
-    private var end: Int = -1
-    private var start: Int = -1
+    private var pos: Int = -2
+    private var end: Int = 0
+    private var startToken: Int = 0
+    private var endToken: Int = 0
 
     override fun start(buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int) {
         this.buffer = buffer
-        pos = startOffset
-        end = endOffset
+        pos = startOffset - 1
+        end = endOffset - 1
         state = initialState
     }
 
     override fun getState(): Int = state
 
     override fun getTokenType(): IElementType? {
-        if(pos == -1 || pos > end) return null
+        if(pos == -2 || pos > end) return null
 
-        when(state){
-            1 -> KatajaElementType("Identifier")
-            2 -> KatajaElementType("Special")
-            3 -> KatajaElementType("Operator")
-            4 -> KatajaElementType("Number")
-            5 -> KatajaElementType("Decimal Number")
-            6 -> KatajaElementType("Comment")
-            7 -> KatajaElementType("Whitespace")
-            8 -> KatajaElementType("New Line")
-            9 -> KatajaElementType("End of Statement")
+        advance()
+        pos = startToken - 1
+
+        return when(state){
+            1 -> KatajaTokenSet.IDENTIFIER
+            2 -> KatajaTokenSet.SPECIAL
+            3 -> KatajaTokenSet.OPERATOR
+            4 -> KatajaTokenSet.NUMBER
+            5 -> KatajaTokenSet.KEYWORD
+            6 -> KatajaTokenSet.COMMENT
+            7 -> KatajaTokenSet.WHITESPACE
+            8 -> KatajaTokenSet.NEW_LINE
+            9 -> KatajaTokenSet.END_OF_STATEMENT
+            10 -> KatajaTokenSet.STRING
+            11 -> KatajaTokenSet.CHAR
+            12 -> KatajaTokenSet.BAD_CHARACTER
+            else -> null
         }
-
-        return null
     }
 
-    override fun getTokenStart(): Int = start
+    override fun getTokenStart(): Int = startToken
 
-    override fun getTokenEnd(): Int = pos
+    override fun getTokenEnd(): Int = endToken +1
 
     override fun advance() {
-        if(pos > end){
-            val current: Char = buffer[pos++]
+        if(pos < end){
+            pos++
+            startToken = pos
+
+            val current: Char = buffer[pos]
 
             if(current == '\n') state = 8
             else if(current == ';') state = 9
-            else if(setOf(' ', '\t').contains(current)){
+            else if(current == '\''){
+                if(pos + 2 > end || buffer[pos + 2] != '\'') state = 12
+                else{
+                    state = 11
+                    pos += 2
+                }
+            }else if(current == '"'){
+                if(pos == end) state = 12
+                else {
+                    pos++
+                    while (pos < end && !setOf('"', '\n').contains(buffer[pos])) pos++
+
+                    state = if(buffer[pos] == '"') 10
+                    else 12
+                }
+            }else if(setOf(' ', '\t').contains(current)){
                 state = 7
                 while(pos < end && setOf(' ', '\t').contains(buffer[pos + 1])) pos++
             }else if(current == '#'){
@@ -60,7 +84,6 @@ class KatajaLexer: Lexer() {
                 while(pos < end && buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)) pos++
 
                 if(pos < end && buffer[pos + 1] == '.'){
-                    state = 5
                     while(pos < end && buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)) pos++
 
                     if(pos < end && setOf('i', 'd', 'l', 's', 'f').contains(buffer[pos + 1])) pos++
@@ -69,9 +92,15 @@ class KatajaLexer: Lexer() {
                 state = 3
                 while(pos < end && setOf('+', '-', '*', '/', '^', '!', '%', '&', '=', '|', '<', '>', '~', '\\').contains(buffer[pos + 1])) pos++
             }else if((current > ('a' - 1) && current < ('z' + 1)) || (current > ('A' - 1) && current < ('Z' + 1))){
+                val identifierStart: Int = pos
                 state = 1
                 while(pos < end && ((buffer[pos + 1] == '_') || (buffer[pos + 1] > ('a' - 1) && buffer[pos + 1] < ('z' + 1)) || (buffer[pos + 1] > ('A' - 1) && buffer[pos + 1] < ('Z' + 1)) || (buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)))) pos++
+
+                if(setOf("if", "else", "while", "for", "public", "private", "protected", "class", "data", "type", "return", "this", "null", "int", "double", "float", "short", "long", "boolean", "final", "const", "extends", "synchronised", "char").contains(buffer.subSequence(identifierStart, pos + 1))) state = 5
+                println(buffer.subSequence(identifierStart, pos + 1))
             }else state = 2
+
+            endToken = pos
         }else state = 0
     }
 

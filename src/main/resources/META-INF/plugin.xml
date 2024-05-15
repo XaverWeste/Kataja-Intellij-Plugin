@@ -28,5 +28,8 @@
                 fieldName="INSTANCE"
                 language="Kataja"
                 extensions="ktj"/>
+        <lang.syntaxHighlighterFactory
+                language="Kataja"
+                implementationClass="com.github.ktj.katajaintellijplugin.KatajaSyntaxHighlighterFactory"/>
     </extensions>
 </idea-plugin>
