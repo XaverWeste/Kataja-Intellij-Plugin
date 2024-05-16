@@ -5,7 +5,14 @@ plugins {
 }
 
 group = "com.github.ktj"
-version = "1.0-SNAPSHOT"
+version = "1.0"
+
+sourceSets {
+    main {
+        java.srcDirs("src/main/java")
+    }
+}
+
 
 repositories {
     mavenCentral()
