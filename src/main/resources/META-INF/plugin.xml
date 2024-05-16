@@ -33,6 +33,5 @@
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaSyntaxHighlighterFactory"/>
         <colorSettingsPage
                 implementation="com.github.ktj.katajaintellijplugin.KatajaColorSettingsPage"/>
-        <internalFileTemplate name="XJLN File"/>
     </extensions>
 </idea-plugin>

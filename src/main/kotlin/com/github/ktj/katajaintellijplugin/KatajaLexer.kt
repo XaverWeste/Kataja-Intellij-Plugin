@@ -96,7 +96,7 @@ class KatajaLexer: Lexer() {
                 state = 1
                 while(pos < end && ((buffer[pos + 1] == '_') || (buffer[pos + 1] > ('a' - 1) && buffer[pos + 1] < ('z' + 1)) || (buffer[pos + 1] > ('A' - 1) && buffer[pos + 1] < ('Z' + 1)) || (buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)))) pos++
 
-                if(setOf("if", "else", "while", "for", "public", "private", "protected", "class", "data", "type", "return", "this", "null", "int", "double", "float", "short", "long", "boolean", "final", "const", "extends", "synchronised", "char").contains(buffer.subSequence(startToken, pos + 1).toString())) state = 5
+                if(setOf("if", "else", "while", "for", "public", "private", "protected", "class", "data", "type", "return", "this", "null", "int", "double", "float", "short", "long", "boolean", "final", "const", "extends", "synchronised", "char", "true", "false").contains(buffer.subSequence(startToken, pos + 1).toString())) state = 5
             }else state = 2
 
             endToken = pos
