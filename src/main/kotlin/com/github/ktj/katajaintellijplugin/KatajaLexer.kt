@@ -30,18 +30,18 @@ class KatajaLexer : Lexer() {
         pos = startToken - 1
 
         return when(state){
-            1 -> KatajaTokenSet.IDENTIFIER
-            2 -> KatajaTokenSet.SPECIAL
-            3 -> KatajaTokenSet.OPERATOR
-            4 -> KatajaTokenSet.NUMBER
-            5 -> KatajaTokenSet.KEYWORD
-            6 -> KatajaTokenSet.COMMENT
-            7 -> KatajaTokenSet.WHITESPACE
-            8 -> KatajaTokenSet.NEW_LINE
-            9 -> KatajaTokenSet.END_OF_STATEMENT
-            10 -> KatajaTokenSet.STRING
-            11 -> KatajaTokenSet.CHAR
-            12 -> KatajaTokenSet.BAD_CHARACTER
+            1 -> KatajaTokenSet.IDENTIFIER.types[0]
+            2 -> KatajaTokenSet.SPECIAL.types[0]
+            3 -> KatajaTokenSet.OPERATOR.types[0]
+            4 -> KatajaTokenSet.NUMBER.types[0]
+            5 -> KatajaTokenSet.KEYWORD.types[0]
+            6 -> KatajaTokenSet.COMMENT.types[0]
+            7 -> KatajaTokenSet.WHITESPACE.types[0]
+            8 -> KatajaTokenSet.NEW_LINE.types[0]
+            9 -> KatajaTokenSet.END_OF_STATEMENT.types[0]
+            10 -> KatajaTokenSet.STRING.types[0]
+            11 -> KatajaTokenSet.CHAR.types[0]
+            12 -> KatajaTokenSet.BAD_CHARACTER.types[0]
             else -> null
         }
     }
