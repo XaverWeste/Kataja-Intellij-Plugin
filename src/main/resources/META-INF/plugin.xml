@@ -33,8 +33,8 @@
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaSyntaxHighlighterFactory"/>
         <colorSettingsPage
                 implementation="com.github.ktj.katajaintellijplugin.KatajaColorSettingsPage"/>
-        <lang.parserDefinition
+        <!--<lang.parserDefinition
             language="Kataja"
-            implementationClass="com.github.ktj.katajaintellijplugin.KatajaParserDefinition"/>
+            implementationClass="com.github.ktj.katajaintellijplugin.KatajaParserDefinition"/>-->
     </extensions>
 </idea-plugin>
