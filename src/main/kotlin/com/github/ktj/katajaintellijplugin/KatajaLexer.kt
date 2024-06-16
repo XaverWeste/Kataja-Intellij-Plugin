@@ -12,7 +12,7 @@ class KatajaLexer : Lexer() {
     private var end: Int = 0
     private var startToken: Int = 0
     private var endToken: Int = 0
-    private val keywords: Set<String> = setOf("if", "else", "while", "for", "public", "private", "protected", "class", "data", "type", "return", "this", "null", "int", "double", "float", "short", "long", "boolean", "final", "const", "extends", "synchronised", "char", "true", "false", "byte", "void", "abstract", "static")
+    private val keywords: Set<String> = setOf("if", "else", "while", "return", "true", "false", "null", "this", "main", "class", "interface", "type", "data", "public", "private", "protected", "static", "synchronised", "abstract", "void", "short", "int", "long", "boolean", "double", "float", "byte", "char", "use", "from", "as")
 
     override fun start(buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int) {
         this.buffer = buffer

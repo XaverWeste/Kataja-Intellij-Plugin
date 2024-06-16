@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="Kataja-Intellij-Plugin.main:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/Kataja_Intellij_Plugin_main_jar</output-path>
-    <root id="archive" name="Kataja-Intellij-Plugin.main.jar">
+  <artifact type="jar" name="Kataja-Intellij-Plugin:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Kataja_Intellij_Plugin_jar</output-path>
+    <root id="archive" name="Kataja-Intellij-Plugin.jar">
       <element id="module-output" name="Kataja-Intellij-Plugin.main" />
       <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
     </root>

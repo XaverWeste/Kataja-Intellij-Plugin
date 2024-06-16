@@ -12,27 +12,22 @@ import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 
 class KatajaParserDefinition: ParserDefinition {
+
+    private val file: IFileElementType = IFileElementType(KatajaLanguage.INSTANCE)
+
     override fun createLexer(project: Project?): Lexer = KatajaLexer()
 
     override fun createParser(project: Project?): PsiParser = KatajaPsiParser()
 
-    override fun getFileNodeType(): IFileElementType {
-        TODO("Not yet implemented")
+    override fun getFileNodeType(): IFileElementType = file
+
+    override fun getCommentTokens(): TokenSet = KatajaTokenSet.COMMENT
+
+    override fun getStringLiteralElements(): TokenSet = KatajaTokenSet.STRING
+
+    override fun createElement(astNode: ASTNode?): PsiElement{
+        TODO()
     }
 
-    override fun getCommentTokens(): TokenSet {
-        TODO("Not yet implemented")
-    }
-
-    override fun getStringLiteralElements(): TokenSet {
-        TODO("Not yet implemented")
-    }
-
-    override fun createElement(astNode: ASTNode?): PsiElement {
-        TODO("Not yet implemented")
-    }
-
-    override fun createFile(fileViewProvider: FileViewProvider): PsiFile {
-        TODO("Not yet implemented")
-    }
+    override fun createFile(fileViewProvider: FileViewProvider): PsiFile = KatajaFile(fileViewProvider)
 }
