@@ -58,7 +58,7 @@ class KatajaLexer : Lexer() {
             val current: Char = buffer[pos]
 
             if(current == '\n') state = 8
-            else if(current == ';') state = 9
+            else if(current == ';' || current == ',') state = 9
             else if(current == '\''){
                 if(pos + 2 > end || buffer[pos + 2] != '\'') state = 12
                 else{
