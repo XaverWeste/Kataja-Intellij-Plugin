@@ -87,9 +87,9 @@ class KatajaLexer : Lexer() {
                 if(pos < end && buffer[pos + 1] == '.'){
                     pos++
                     while(pos < end && buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)) pos++
-
-                    if(pos < end && setOf('i', 'd', 'l', 's', 'f').contains(buffer[pos + 1])) pos++
                 }
+
+                if(pos < end && setOf('i', 'd', 'l', 's', 'f').contains(buffer[pos + 1])) pos++
             }else if(setOf('+', '-', '*', '/', '^', '!', '%', '&', '=', '|', '<', '>', '~', '\\').contains(current)){
                 state = 3
                 while(pos < end && setOf('+', '-', '*', '/', '^', '!', '%', '&', '=', '|', '<', '>', '~', '\\').contains(buffer[pos + 1])) pos++
