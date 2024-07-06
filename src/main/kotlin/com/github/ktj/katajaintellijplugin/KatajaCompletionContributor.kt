@@ -4,10 +4,10 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.util.ProcessingContext
 
-
 class KatajaCompletionContributor : CompletionContributor() {
 
-    init {
+    init{
+        println("\n\ntest\n\n")
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(),
             object : CompletionProvider<CompletionParameters?>() {
                 override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, resultSet: CompletionResultSet){

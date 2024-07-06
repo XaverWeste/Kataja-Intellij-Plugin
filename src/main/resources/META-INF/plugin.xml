@@ -10,6 +10,8 @@
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor>Xaver Weste</vendor>
 
+    <version>1.0</version>
+
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
@@ -33,11 +35,11 @@
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaSyntaxHighlighterFactory"/>
         <colorSettingsPage
                 implementation="com.github.ktj.katajaintellijplugin.KatajaColorSettingsPage"/>
+        <lang.parserDefinition
+                language="Kataja"
+                implementationClass="com.github.ktj.katajaintellijplugin.KatajaParser"/>
         <completion.contributor
                 language="Kataja"
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaCompletionContributor"/>
-        <!--<lang.parserDefinition
-            language="Kataja"
-            implementationClass="com.github.ktj.katajaintellijplugin.KatajaParserDefinition"/>-->
     </extensions>
 </idea-plugin>

@@ -6,7 +6,5 @@ import com.intellij.lang.PsiParser
 import com.intellij.psi.tree.IElementType
 
 class KatajaPsiParser: PsiParser {
-    override fun parse(type: IElementType, builder: PsiBuilder): ASTNode {
-        TODO("Not yet implemented")
-    }
+    override fun parse(type: IElementType, builder: PsiBuilder): ASTNode = builder.treeBuilt
 }
