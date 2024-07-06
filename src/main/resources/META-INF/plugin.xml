@@ -33,6 +33,9 @@
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaSyntaxHighlighterFactory"/>
         <colorSettingsPage
                 implementation="com.github.ktj.katajaintellijplugin.KatajaColorSettingsPage"/>
+        <completion.contributor
+                language="Kataja"
+                implementationClass="com.github.ktj.katajaintellijplugin.KatajaCompletionContributor"/>
         <!--<lang.parserDefinition
             language="Kataja"
             implementationClass="com.github.ktj.katajaintellijplugin.KatajaParserDefinition"/>-->
