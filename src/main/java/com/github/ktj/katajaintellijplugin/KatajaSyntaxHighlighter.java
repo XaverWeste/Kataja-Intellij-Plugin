@@ -26,7 +26,7 @@ public class KatajaSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] Keyword = new TextAttributesKey[]{keyword};
     private static final TextAttributesKey[] Number = new TextAttributesKey[]{number};
     private static final TextAttributesKey[] Comment = new TextAttributesKey[]{comment};
-    private static final TextAttributesKey[] Semicolon = new TextAttributesKey[]{semicolon};
+    private static final TextAttributesKey[] Single = new TextAttributesKey[]{semicolon};
     private static final TextAttributesKey[] String = new TextAttributesKey[]{string};
     private static final TextAttributesKey[] Operator = new TextAttributesKey[]{operator};
     private static final TextAttributesKey[] BAD_CHARACTER = new TextAttributesKey[]{bad_character};
@@ -46,7 +46,7 @@ public class KatajaSyntaxHighlighter extends SyntaxHighlighterBase {
             if(type.equals(KatajaTokenSet.KEYWORD.getTypes()[0])) return Keyword;
             if(type.equals(KatajaTokenSet.NUMBER.getTypes()[0])) return Number;
             if(type.equals(KatajaTokenSet.COMMENT.getTypes()[0])) return Comment;
-            if(type.equals(KatajaTokenSet.END_OF_STATEMENT.getTypes()[0])) return Semicolon;
+            if(type.equals(KatajaTokenSet.SINGLE.getTypes()[0])) return Single;
             if(type.equals(KatajaTokenSet.STRING.getTypes()[0])) return String;
             if(type.equals(KatajaTokenSet.CHAR.getTypes()[0])) return Char;
             if(type.equals(KatajaTokenSet.OPERATOR.getTypes()[0])) return Operator;

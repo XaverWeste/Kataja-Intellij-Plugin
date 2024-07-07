@@ -5,6 +5,10 @@ import com.intellij.lexer.LexerPosition
 import com.intellij.psi.tree.IElementType
 
 class KatajaLexer : Lexer() {
+
+    companion object{
+        val keywords: Set<String> = setOf("if", "else", "while", "return", "true", "false", "null", "this", "main", "class", "interface", "type", "data", "public", "private", "protected", "static", "synchronised", "abstract", "void", "short", "int", "long", "boolean", "double", "float", "byte", "char", "use", "from", "as", "const", "final", "extends", "throw", "switch", "case", "default")
+    }
     
     private lateinit var buffer: CharSequence
     private var state = 0
@@ -12,7 +16,6 @@ class KatajaLexer : Lexer() {
     private var end: Int = 0
     private var startToken: Int = 0
     private var endToken: Int = 0
-    private val keywords: Set<String> = setOf("if", "else", "while", "return", "true", "false", "null", "this", "main", "class", "interface", "type", "data", "public", "private", "protected", "static", "synchronised", "abstract", "void", "short", "int", "long", "boolean", "double", "float", "byte", "char", "use", "from", "as", "const", "final", "extends", "throw", "switch", "case", "default")
 
     override fun start(buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int) {
         this.buffer = buffer
@@ -38,7 +41,7 @@ class KatajaLexer : Lexer() {
             6 -> KatajaTokenSet.COMMENT.types[0]
             7 -> KatajaTokenSet.WHITESPACE.types[0]
             8 -> KatajaTokenSet.NEW_LINE.types[0]
-            9 -> KatajaTokenSet.END_OF_STATEMENT.types[0]
+            9 -> KatajaTokenSet.SINGLE.types[0]
             10 -> KatajaTokenSet.STRING.types[0]
             11 -> KatajaTokenSet.CHAR.types[0]
             12 -> KatajaTokenSet.BAD_CHARACTER.types[0]
@@ -58,7 +61,7 @@ class KatajaLexer : Lexer() {
             val current: Char = buffer[pos]
 
             if(current == '\n') state = 8
-            else if(current == ';' || current == ',') state = 9
+            else if(current == ';' || current == ',' || current == '$') state = 9
             else if(current == '\''){
                 if(pos + 2 > end || buffer[pos + 2] != '\'') state = 12
                 else{
@@ -80,6 +83,7 @@ class KatajaLexer : Lexer() {
             }else if(current == '#'){
                 state = 6
                 while(pos < end && !setOf('#', '\n').contains(buffer[pos + 1])) pos++
+                if(pos < end && buffer[pos + 1] == '#') pos++
             }else if(current > ('0' - 1) && current < ('9' + 1)){
                 state = 4
                 while(pos < end && buffer[pos + 1] > ('0' - 1) && buffer[pos + 1] < ('9' + 1)) pos++

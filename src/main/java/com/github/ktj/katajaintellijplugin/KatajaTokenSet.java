@@ -12,7 +12,7 @@ public interface KatajaTokenSet{
     TokenSet COMMENT          = TokenSet.create(new KatajaTokenType("Comment"));
     TokenSet WHITESPACE       = TokenSet.create(new KatajaTokenType("Whitespace"));
     TokenSet NEW_LINE         = TokenSet.create(new KatajaTokenType("New Line"));
-    TokenSet END_OF_STATEMENT = TokenSet.create(new KatajaTokenType("End of Statement"));
+    TokenSet SINGLE           = TokenSet.create(new KatajaTokenType("SINGLE"));
     TokenSet STRING           = TokenSet.create(new KatajaTokenType("String"));
     TokenSet CHAR             = TokenSet.create(new KatajaTokenType("Char"));
     TokenSet BAD_CHARACTER    = TokenSet.create(new KatajaTokenType("Bad Character"));
