@@ -41,16 +41,16 @@ public class KatajaSyntaxHighlighter extends SyntaxHighlighterBase {
     @Override
     public TextAttributesKey @NotNull [] getTokenHighlights(IElementType type) {
         if(type != null) {
-            if(type.equals(KatajaTokenSet.IDENTIFIER.getTypes()[0])) return Identifier;
-            if(type.equals(KatajaTokenSet.SPECIAL.getTypes()[0])) return Special;
-            if(type.equals(KatajaTokenSet.KEYWORD.getTypes()[0])) return Keyword;
-            if(type.equals(KatajaTokenSet.NUMBER.getTypes()[0])) return Number;
-            if(type.equals(KatajaTokenSet.COMMENT.getTypes()[0])) return Comment;
-            if(type.equals(KatajaTokenSet.SINGLE.getTypes()[0])) return Single;
-            if(type.equals(KatajaTokenSet.STRING.getTypes()[0])) return String;
-            if(type.equals(KatajaTokenSet.CHAR.getTypes()[0])) return Char;
-            if(type.equals(KatajaTokenSet.OPERATOR.getTypes()[0])) return Operator;
-            if(type.equals(KatajaTokenSet.BAD_CHARACTER.getTypes()[0])) return BAD_CHARACTER;
+            if(type.equals(KatajaTokenTypes.IDENTIFIER)) return Identifier;
+            if(type.equals(KatajaTokenTypes.SPECIAL)) return Special;
+            if(type.equals(KatajaTokenTypes.KEYWORD)) return Keyword;
+            if(type.equals(KatajaTokenTypes.NUMBER)) return Number;
+            if(type.equals(KatajaTokenTypes.COMMENT)) return Comment;
+            if(type.equals(KatajaTokenTypes.SINGLE)) return Single;
+            if(type.equals(KatajaTokenTypes.STRING)) return String;
+            if(type.equals(KatajaTokenTypes.CHAR)) return Char;
+            if(type.equals(KatajaTokenTypes.OPERATOR)) return Operator;
+            if(type.equals(KatajaTokenTypes.BAD_CHARACTER)) return BAD_CHARACTER;
         }
         return new TextAttributesKey[0];
     }

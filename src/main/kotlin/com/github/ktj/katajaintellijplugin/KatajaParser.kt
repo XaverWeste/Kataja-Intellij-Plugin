@@ -21,9 +21,9 @@ class KatajaParser : ParserDefinition {
 
     override fun getFileNodeType(): IFileElementType = FILE
 
-    override fun getCommentTokens(): TokenSet = KatajaTokenSet.COMMENT
+    override fun getCommentTokens(): TokenSet = TokenSet.create(KatajaTokenTypes.COMMENT)
 
-    override fun getStringLiteralElements(): TokenSet = KatajaTokenSet.STRING
+    override fun getStringLiteralElements(): TokenSet = TokenSet.create(KatajaTokenTypes.STRING)
 
     override fun createElement(p0: ASTNode?): PsiElement = PsiFactory.createElement(p0)
 

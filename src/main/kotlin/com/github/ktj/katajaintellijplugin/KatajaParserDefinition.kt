@@ -1,5 +1,6 @@
 package com.github.ktj.katajaintellijplugin
 
+import com.github.ktj.katajaintellijplugin.psi.PsiFactory
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
 import com.intellij.lang.PsiParser
@@ -21,13 +22,11 @@ class KatajaParserDefinition: ParserDefinition {
 
     override fun getFileNodeType(): IFileElementType = file
 
-    override fun getCommentTokens(): TokenSet = KatajaTokenSet.COMMENT
+    override fun getCommentTokens(): TokenSet = TokenSet.create(KatajaTokenTypes.COMMENT)
 
-    override fun getStringLiteralElements(): TokenSet = KatajaTokenSet.STRING
+    override fun getStringLiteralElements(): TokenSet = TokenSet.create(KatajaTokenTypes.STRING)
 
-    override fun createElement(astNode: ASTNode?): PsiElement{
-        TODO()
-    }
+    override fun createElement(astNode: ASTNode?): PsiElement = PsiFactory.createElement(astNode)
 
     override fun createFile(fileViewProvider: FileViewProvider): PsiFile = KatajaFile(fileViewProvider)
 }
