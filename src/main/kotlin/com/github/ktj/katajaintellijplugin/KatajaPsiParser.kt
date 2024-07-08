@@ -34,19 +34,19 @@ class KatajaPsiParser: PsiParser {
         assert(KatajaTokenTypes.IDENTIFIER)
 
         var mult = false
-        next()
+        if(hasNext()) next()
 
         while(builder.tokenText.equals(",")){
             mult = true
             assert(KatajaTokenTypes.IDENTIFIER)
-            next()
+            assertNext()
         }
 
         if(mult){
-            if(!builder.tokenText.equals("from")) error("Expected from")
+            if(!builder.tokenText.equals("from")) builder.error("Expected from")
 
             assert(KatajaTokenTypes.IDENTIFIER)
-            next()
+            if(hasNext()) next()
 
             while(builder.tokenText.equals("/")){
                 assert(KatajaTokenTypes.IDENTIFIER)
@@ -55,7 +55,7 @@ class KatajaPsiParser: PsiParser {
         }else{
             if(builder.tokenText.equals("from")){
                 assert(KatajaTokenTypes.IDENTIFIER)
-                next()
+                if(hasNext()) next()
             }
 
             while(builder.tokenText.equals("/")){
@@ -63,11 +63,10 @@ class KatajaPsiParser: PsiParser {
                 if(hasNext()) next()
             }
 
-            builder.tokenText.equals("as")
-            assert(KatajaTokenTypes.IDENTIFIER)
+            if(builder.tokenText.equals("as")) assert(KatajaTokenTypes.IDENTIFIER)
         }
 
-        if(hasNext()) builder.error("Expected new line")
+        //if(hasNext() && !builder.eof()) builder.error("Expected new line")
     }
 
     private fun parseType(){
@@ -82,6 +81,8 @@ class KatajaPsiParser: PsiParser {
     }
 
     private fun hasNext(): Boolean{
+        val offset = builder.currentOffset
+
         while(!builder.eof() && (builder.lookAhead(1) == KatajaTokenTypes.WHITESPACE || builder.lookAhead(1) == KatajaTokenTypes.COMMENT)){
             builder.advanceLexer()
         }
@@ -89,7 +90,13 @@ class KatajaPsiParser: PsiParser {
         if(builder.eof()) return false
         if(builder.lookAhead(1) == KatajaTokenTypes.NEW_LINE) builder.advanceLexer()
 
-        return builder.tokenType != KatajaTokenTypes.NEW_LINE
+        return builder.tokenType != KatajaTokenTypes.NEW_LINE && offset != builder.currentOffset
+    }
+
+    private fun assertNext(){
+        next()
+
+        if(builder.eof()) builder.error("Expected next")
     }
 
     private fun assert(s: String){
