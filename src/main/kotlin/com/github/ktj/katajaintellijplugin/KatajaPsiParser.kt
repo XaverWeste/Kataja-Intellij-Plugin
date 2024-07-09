@@ -13,60 +13,80 @@ class KatajaPsiParser: PsiParser {
         this.builder = builder
 
         val marker = builder.mark()
-        var eof = false
+        while(builder.tokenType == KatajaTokenTypes.COMMENT || builder.tokenType == KatajaTokenTypes.WHITESPACE) builder.advanceLexer()
 
-        while (!eof){
-            when(builder.tokenText){
-                "use" -> parseUse()
-                "type" -> parseType()
+        do{
+            if(!(builder.tokenType == KatajaTokenTypes.NEW_LINE || builder.tokenText.equals(";"))){
+                when(builder.tokenText){
+                    "use" -> parseUse()
+                    "public", "private", "protected", "const", "final", "synchronised", "abstract", "static" -> parseMod()
+                    null -> {
+                        marker.done(type)
+                        return builder.treeBuilt
+                    }
+                    else -> builder.error("Illegal statement")
+                }
             }
-
-            if(builder.eof()) eof = true
-            else builder.advanceLexer()
-        }
-
-        marker.done(type)
-
-        return builder.treeBuilt
+            skipWhitespace()
+            builder.advanceLexer()
+        }while(true)
     }
 
     private fun parseUse(){
         assert(KatajaTokenTypes.IDENTIFIER)
 
-        var mult = false
-        if(hasNext()) next()
-
-        while(builder.tokenText.equals(",")){
-            mult = true
-            assert(KatajaTokenTypes.IDENTIFIER)
-            assertNext()
-        }
-
-        if(mult){
-            if(!builder.tokenText.equals("from")) builder.error("Expected from")
-
-            assert(KatajaTokenTypes.IDENTIFIER)
-            if(hasNext()) next()
-
-            while(builder.tokenText.equals("/")){
+        if(isNext(KatajaTokenTypes.SINGLE)){
+            while(isNext(KatajaTokenTypes.SINGLE)){
+                builder.advanceLexer()
+                when(builder.tokenText){
+                    "," -> {}
+                    ";" -> return
+                    else -> builder.error("Expected ,")
+                }
                 assert(KatajaTokenTypes.IDENTIFIER)
-                if(hasNext()) next()
+            }
+
+            assert("from")
+            assert(KatajaTokenTypes.IDENTIFIER)
+
+            while(isNext(KatajaTokenTypes.OPERATOR)){
+                assert("/")
+                assert(KatajaTokenTypes.IDENTIFIER)
             }
         }else{
-            if(builder.tokenText.equals("from")){
+            if(isNext(KatajaTokenTypes.KEYWORD)){
+                assert("from")
                 assert(KatajaTokenTypes.IDENTIFIER)
-                if(hasNext()) next()
             }
 
-            while(builder.tokenText.equals("/")){
+            while(isNext(KatajaTokenTypes.OPERATOR)){
+                assert("/")
                 assert(KatajaTokenTypes.IDENTIFIER)
-                if(hasNext()) next()
             }
 
-            if(builder.tokenText.equals("as")) assert(KatajaTokenTypes.IDENTIFIER)
+            if(isNext(KatajaTokenTypes.KEYWORD)){
+                assert("as")
+                assert(KatajaTokenTypes.IDENTIFIER)
+            }
         }
 
-        //if(hasNext() && !builder.eof()) builder.error("Expected new line")
+        assertEnd()
+    }
+
+    private fun parseMod(){
+        while(isNext(KatajaTokenTypes.KEYWORD)){
+            assert(KatajaTokenTypes.KEYWORD)
+            when(builder.tokenText){
+                "const", "final", "synchronised", "abstract", "static" -> {}
+                "type" -> {
+                    parseType()
+                    return
+                }
+                else -> builder.error("Expected modifier")
+            }
+        }
+
+        builder.error("Expected class")
     }
 
     private fun parseType(){
@@ -74,56 +94,62 @@ class KatajaPsiParser: PsiParser {
         assert("=")
         assert(KatajaTokenTypes.IDENTIFIER)
 
-        while(hasNext()){
+        while(isNext(KatajaTokenTypes.OPERATOR)){
             assert("|")
             assert(KatajaTokenTypes.IDENTIFIER)
         }
+
+        assertEnd()
     }
 
-    private fun hasNext(): Boolean{
-        val offset = builder.currentOffset
+    private fun assertEnd(){
+        if(!hasNext()) return
 
-        while(!builder.eof() && (builder.lookAhead(1) == KatajaTokenTypes.WHITESPACE || builder.lookAhead(1) == KatajaTokenTypes.COMMENT)){
-            builder.advanceLexer()
+        builder.advanceLexer()
+        if(builder.tokenType != KatajaTokenTypes.NEW_LINE && !builder.tokenText.equals(";") && !builder.eof()){
+            builder.error("Expected end of statement")
         }
-
-        if(builder.eof()) return false
-        if(builder.lookAhead(1) == KatajaTokenTypes.NEW_LINE) builder.advanceLexer()
-
-        return builder.tokenType != KatajaTokenTypes.NEW_LINE && offset != builder.currentOffset
-    }
-
-    private fun assertNext(){
-        next()
-
-        if(builder.eof()) builder.error("Expected next")
     }
 
     private fun assert(s: String){
-        next()
+        if(!hasNext()){
+            builder.advanceLexer()
+            builder.error("Expected $s")
+            return
+        }
 
-        if(!builder.tokenText.equals(s)) builder.error("Expected $s")
+        builder.advanceLexer()
+
+        if(!builder.tokenText.equals(s)){
+            builder.error("Expected $s")
+        }
     }
 
     private fun assert(type: IElementType){
-        next()
-
-        if(builder.tokenType != type) builder.error("Expected $type")
+        if(!isNext(type)){
+            builder.advanceLexer()
+            builder.error("Expected $type")
+        }else builder.advanceLexer()
     }
 
     private fun isNext(type: IElementType): Boolean{
-        next()
-
-        if(builder.eof()) return false
-
+        if(!hasNext()) return false
         return builder.lookAhead(1) == type
     }
 
     private fun next(){
+        if(!hasNext()) builder.error("Expected next")
+        builder.advanceLexer()
+    }
+
+    private fun hasNext(): Boolean{
+        skipWhitespace()
+        return !builder.eof()
+    }
+
+    private fun skipWhitespace(){
         while(!builder.eof() && (builder.lookAhead(1) == KatajaTokenTypes.WHITESPACE || builder.lookAhead(1) == KatajaTokenTypes.COMMENT)){
             builder.advanceLexer()
         }
-
-        if(!builder.eof()) builder.advanceLexer()
     }
 }
