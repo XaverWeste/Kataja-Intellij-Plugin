@@ -90,11 +90,12 @@ class KatajaPsiParser: PsiParser {
                     parseClass()
                     return
                 }
+                "int", "short", "long", "boolean", "byte", "char", "float", "double" -> parseMethodOrField(false)
                 else -> builder.error("Expected modifier")
             }
         }
 
-        parseMethodOrField()
+        parseMethodOrField(true)
     }
 
     private fun parseType(){
@@ -126,27 +127,52 @@ class KatajaPsiParser: PsiParser {
             }
             if(isNext(KatajaTokenTypes.NEW_LINE)) next()
             else if(isNext(KatajaTokenTypes.SINGLE)) assert(";")
-            else parseMethodOrField()
+            else parseMethodOrField(true)
         }
         assert("}")
         assertEnd()
     }
 
-    private fun parseMethodOrField(){
+    private fun parseMethodOrField(parseType: Boolean){
         var method = false
 
-        if(isNext(KatajaTokenTypes.KEYWORD)){
-            if(!(builder.tokenText.equals("int") || builder.tokenText.equals("short") || builder.tokenText.equals("long") || builder.tokenText.equals("double") || builder.tokenText.equals("float") || builder.tokenText.equals("boolean") || builder.tokenText.equals("char") || builder.tokenText.equals("byte"))) builder.error("Expected type")
-            assert(KatajaTokenTypes.IDENTIFIER)
-        }else{
-            assert(KatajaTokenTypes.IDENTIFIER)
-            if(isNext(KatajaTokenTypes.IDENTIFIER)) assert(KatajaTokenTypes.IDENTIFIER)
-            else method = true
-        }
+        if(parseType){
+            if (isNext(KatajaTokenTypes.KEYWORD)){
+                assert(KatajaTokenTypes.KEYWORD)
+                if(!setOf("int", "double", "short", "long", "float", "char", "byte", "boolean").contains(builder.tokenText))
+                assert(KatajaTokenTypes.IDENTIFIER)
+            }else{
+                assert(KatajaTokenTypes.IDENTIFIER)
+                if (isNext(KatajaTokenTypes.IDENTIFIER)) assert(KatajaTokenTypes.IDENTIFIER)
+                else method = true
+            }
+        }else assert(KatajaTokenTypes.IDENTIFIER)
 
         if(isNext(KatajaTokenTypes.SPECIAL) || method){
-            assert("(")
+            assert(KatajaTokenTypes.SPECIAL)
+            when(builder.tokenText){
+                "(" -> {
+                    if(isNext(KatajaTokenTypes.SPECIAL)) assert(")")
+                    else{
+                        do{
+                            if(isNext(KatajaTokenTypes.KEYWORD)){
+                                assert(KatajaTokenTypes.KEYWORD)
+                                if(!setOf("int", "double", "short", "long", "float", "char", "byte", "boolean").contains(builder.tokenText)) builder.error("Expected type")
+                            }else assert(KatajaTokenTypes.IDENTIFIER)
 
+                            assert(KatajaTokenTypes.IDENTIFIER)
+
+                            if(isNext(KatajaTokenTypes.SPECIAL)){
+                                assert(KatajaTokenTypes.SPECIAL)
+                                if(builder.tokenText.equals(")")) break
+                                else if(!builder.tokenText.equals(",") || builder.eof()) builder.error("Expected )")
+                            }
+                        }while(true)
+                    }
+                }
+                "=" -> {}
+                else -> builder.error("Expected (")
+            }
         }
 
         assertEnd()
