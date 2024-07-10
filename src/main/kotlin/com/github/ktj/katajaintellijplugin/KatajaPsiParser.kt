@@ -19,7 +19,9 @@ class KatajaPsiParser: PsiParser {
             if(!(builder.tokenType == KatajaTokenTypes.NEW_LINE || builder.tokenText.equals(";"))){
                 when(builder.tokenText){
                     "use" -> parseUse()
-                    "public", "private", "protected", "const", "final", "synchronised", "abstract", "static" -> parseMod()
+                    "public", "private", "protected", "const", "final", "synchronised", "abstract", "static" -> parseMod(true)
+                    "type" -> parseType()
+                    "class" -> parseClass()
                     null -> {
                         marker.done(type)
                         return builder.treeBuilt
@@ -73,30 +75,78 @@ class KatajaPsiParser: PsiParser {
         assertEnd()
     }
 
-    private fun parseMod(){
+    private fun parseMod(allowClass: Boolean){
         while(isNext(KatajaTokenTypes.KEYWORD)){
             assert(KatajaTokenTypes.KEYWORD)
             when(builder.tokenText){
                 "const", "final", "synchronised", "abstract", "static" -> {}
                 "type" -> {
+                    if(!allowClass) builder.error("Illegal statement")
                     parseType()
+                    return
+                }
+                "class" -> {
+                    if(!allowClass) builder.error("Illegal statement")
+                    parseClass()
                     return
                 }
                 else -> builder.error("Expected modifier")
             }
         }
 
-        builder.error("Expected class")
+        parseMethodOrField()
     }
 
     private fun parseType(){
         assert(KatajaTokenTypes.IDENTIFIER)
         assert("=")
         assert(KatajaTokenTypes.IDENTIFIER)
-
         while(isNext(KatajaTokenTypes.OPERATOR)){
             assert("|")
             assert(KatajaTokenTypes.IDENTIFIER)
+        }
+        assertEnd()
+    }
+
+    private fun parseClass(){
+        assert(KatajaTokenTypes.IDENTIFIER)
+        if(isNext(KatajaTokenTypes.KEYWORD)){
+            assert("extends")
+            assert(KatajaTokenTypes.IDENTIFIER)
+            while(isNext(KatajaTokenTypes.SINGLE)){
+                assert(",")
+                assert(KatajaTokenTypes.IDENTIFIER)
+            }
+        }
+        assert("{")
+        while(!isNext(KatajaTokenTypes.SPECIAL)){
+            if(!hasNext()){
+                builder.error("Expected }")
+                return
+            }
+            if(isNext(KatajaTokenTypes.NEW_LINE)) next()
+            else if(isNext(KatajaTokenTypes.SINGLE)) assert(";")
+            else parseMethodOrField()
+        }
+        assert("}")
+        assertEnd()
+    }
+
+    private fun parseMethodOrField(){
+        var method = false
+
+        if(isNext(KatajaTokenTypes.KEYWORD)){
+            if(!(builder.tokenText.equals("int") || builder.tokenText.equals("short") || builder.tokenText.equals("long") || builder.tokenText.equals("double") || builder.tokenText.equals("float") || builder.tokenText.equals("boolean") || builder.tokenText.equals("char") || builder.tokenText.equals("byte"))) builder.error("Expected type")
+            assert(KatajaTokenTypes.IDENTIFIER)
+        }else{
+            assert(KatajaTokenTypes.IDENTIFIER)
+            if(isNext(KatajaTokenTypes.IDENTIFIER)) assert(KatajaTokenTypes.IDENTIFIER)
+            else method = true
+        }
+
+        if(isNext(KatajaTokenTypes.SPECIAL) || method){
+            assert("(")
+
         }
 
         assertEnd()
