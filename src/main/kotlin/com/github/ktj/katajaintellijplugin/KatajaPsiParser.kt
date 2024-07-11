@@ -107,7 +107,10 @@ class KatajaPsiParser: PsiParser {
                     parseClass()
                     return
                 }
-                "int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> parseMethodOrField(false)
+                "int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> {
+                    parseMethodOrField(false)
+                    return
+                }
                 "public", "private", "protected" -> {
                     if(acc) builder.error("Expected modifier")
                     acc = true
@@ -262,15 +265,15 @@ class KatajaPsiParser: PsiParser {
         assert("{")
         var i = 1
         while(i > 0){
-            if(builder.eof()) break
-            if(isNext(KatajaTokenTypes.NEW_LINE)) next()
-            else if(isNext(KatajaTokenTypes.SPECIAL)){
+            if(builder.eof()){
+                builder.error("Expected {")
+                return
+            }else if(isNext(KatajaTokenTypes.SPECIAL)){
+                assert(KatajaTokenTypes.SPECIAL)
                 if(builder.tokenText.equals("{")) i++
                 else if(builder.tokenText.equals("}")) i--
-            }
-            next()
+            }else next()
         }
-        assert("}")
     }
 
     private fun toEndOfLine(){
