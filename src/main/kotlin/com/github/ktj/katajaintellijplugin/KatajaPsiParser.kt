@@ -21,11 +21,11 @@ class KatajaPsiParser: PsiParser {
                 when(builder.tokenText){
                     "use" -> parseUse()
                     "public", "private", "protected", "const", "final", "synchronised", "abstract", "static" -> parseMod(true)
-                    "int", "short", "long", "boolean", "byte", "char", "float", "double" -> parseMethodOrField(false)
-                    "type" -> parseType(builder.mark())
-                    "data" -> parseData(builder.mark())
-                    "interface" -> parseInterface(builder.mark())
-                    "class" -> parseClass(builder.mark())
+                    "int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> parseMethodOrField(false)
+                    "type" -> parseType()
+                    "data" -> parseData()
+                    "interface" -> parseInterface()
+                    "class" -> parseClass()
                     null -> {
                         marker.done(type)
                         return builder.treeBuilt
@@ -42,7 +42,6 @@ class KatajaPsiParser: PsiParser {
     }
 
     private fun parseUse(){
-        val marker = builder.mark()
         if(isNext(KatajaTokenTypes.SINGLE)) assert("$")
         assert(KatajaTokenTypes.IDENTIFIER)
 
@@ -78,36 +77,41 @@ class KatajaPsiParser: PsiParser {
         }
 
         assertEnd()
-        marker.done(KatajaElementTypes.USE)
     }
 
     private fun parseMod(allowClass: Boolean){
-        val marker = builder.mark()
+        var acc = false
+        if(setOf("public", "private", "protected").contains(builder.tokenText)) acc = true
+
         while(isNext(KatajaTokenTypes.KEYWORD)){
             assert(KatajaTokenTypes.KEYWORD)
             when(builder.tokenText){
                 "const", "final", "synchronised", "abstract", "static" -> {}
                 "type" -> {
                     if(!allowClass) builder.error("Illegal statement")
-                    parseType(marker)
+                    parseType()
                     return
                 }
                 "data" -> {
                     if(!allowClass) builder.error("Illegal statement")
-                    parseData(marker)
+                    parseData()
                     return
                 }
                 "interface" -> {
                     if(!allowClass) builder.error("Illegal statement")
-                    parseInterface(marker)
+                    parseInterface()
                     return
                 }
                 "class" -> {
                     if(!allowClass) builder.error("Illegal statement")
-                    parseClass(marker)
+                    parseClass()
                     return
                 }
-                "int", "short", "long", "boolean", "byte", "char", "float", "double" -> parseMethodOrField(false)
+                "int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> parseMethodOrField(false)
+                "public", "private", "protected" -> {
+                    if(acc) builder.error("Expected modifier")
+                    acc = true
+                }
                 else -> builder.error("Expected modifier")
             }
         }
@@ -115,7 +119,7 @@ class KatajaPsiParser: PsiParser {
         parseMethodOrField(true)
     }
 
-    private fun parseType(marker: Marker){
+    private fun parseType(){
         assert(KatajaTokenTypes.IDENTIFIER)
         assert("=")
         assert(KatajaTokenTypes.IDENTIFIER)
@@ -124,10 +128,9 @@ class KatajaPsiParser: PsiParser {
             assert(KatajaTokenTypes.IDENTIFIER)
         }
         assertEnd()
-        marker.done(KatajaElementTypes.TYPE)
     }
 
-    private fun parseData(marker: Marker){
+    private fun parseData(){
         assert(KatajaTokenTypes.IDENTIFIER)
         assert("=")
         assert("(")
@@ -143,10 +146,9 @@ class KatajaPsiParser: PsiParser {
         }
         assert(")")
         assertEnd()
-        marker.done(KatajaElementTypes.DATA)
     }
 
-    private fun parseInterface(marker: Marker){
+    private fun parseInterface(){
         assert(KatajaTokenTypes.IDENTIFIER)
         assert("{")
         while(!isNext(KatajaTokenTypes.SPECIAL)){
@@ -161,11 +163,9 @@ class KatajaPsiParser: PsiParser {
         }
         assert("}")
         assertEnd()
-        marker.done(KatajaElementTypes.INTERFACE)
     }
 
-    private fun parseClass(marker: Marker){
-        builder.mark()
+    private fun parseClass(){
         assert(KatajaTokenTypes.IDENTIFIER)
         if(isNext(KatajaTokenTypes.KEYWORD)){
             assert("extends")
@@ -188,7 +188,6 @@ class KatajaPsiParser: PsiParser {
         }
         assert("}")
         assertEnd()
-        marker.done(KatajaElementTypes.CLASS)
     }
 
     private fun parseMethodOrField(parseType: Boolean){
@@ -242,12 +241,15 @@ class KatajaPsiParser: PsiParser {
         return
     }
 
-
-
     private fun parseDataType(){
         if(isNext(KatajaTokenTypes.KEYWORD)){
             assert(KatajaTokenTypes.KEYWORD)
-            if (!setOf("int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
+            if(builder.tokenText.equals("const")){
+                if(isNext(KatajaTokenTypes.KEYWORD)) {
+                    assert(KatajaTokenTypes.KEYWORD)
+                    if (!setOf("void", "int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
+                }else assert(KatajaTokenTypes.IDENTIFIER)
+            }else if (!setOf("void", "int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
         }else assert(KatajaTokenTypes.IDENTIFIER)
 
         while(isNext(KatajaTokenTypes.SPECIAL)){
@@ -260,16 +262,13 @@ class KatajaPsiParser: PsiParser {
         assert("{")
         var i = 1
         while(i > 0){
+            if(builder.eof()) break
             if(isNext(KatajaTokenTypes.NEW_LINE)) next()
             else if(isNext(KatajaTokenTypes.SPECIAL)){
                 if(builder.tokenText.equals("{")) i++
                 else if(builder.tokenText.equals("}")) i--
-            }else{
-                if(!hasNext()){
-                    builder.error("Expected }")
-                    return
-                }
             }
+            next()
         }
         assert("}")
     }
