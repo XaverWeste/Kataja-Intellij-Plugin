@@ -228,10 +228,10 @@ class KatajaPsiParser: PsiParser {
             else{
                 assert(KatajaTokenTypes.OPERATOR)
                 when(builder.tokenText){
-                    "=" -> parseCalc()
+                    "=" -> toEndOfLine()
                     "->" -> {
                         if(!method) builder.error("Expected =")
-                        else parseStatement()
+                        else toEndOfLine()
                     }
                     else -> builder.error("Illegal argument")
                 }
@@ -242,234 +242,7 @@ class KatajaPsiParser: PsiParser {
         return
     }
 
-    private fun parseStatement(){
-        if(isNext(KatajaTokenTypes.IDENTIFIER)) assert(KatajaTokenTypes.IDENTIFIER)
-        else assert(KatajaTokenTypes.KEYWORD)
 
-        when(builder.tokenText){
-            "return", "throw" -> parseCalc()
-            "while" -> parseWhile()
-            "if" -> parseIf()
-            "switch" -> parseSwitch()
-            else -> {
-                if(builder.tokenType == KatajaTokenTypes.KEYWORD){
-                    if (!setOf("int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
-                    while(isNext(KatajaTokenTypes.SPECIAL)){
-                        assert("[")
-                        assert("]")
-                    }
-                    assert(KatajaTokenTypes.IDENTIFIER)
-                    assert("=")
-                    parseCalc()
-                }else{
-                    if(isNext(KatajaTokenTypes.SPECIAL)){
-                        assert(KatajaTokenTypes.SPECIAL)
-                        if(builder.tokenText.equals("(")){
-                            if(isNext(KatajaTokenTypes.SPECIAL)) assert(")")
-                            else{
-                                parseCalc()
-                                while (isNext(KatajaTokenTypes.SINGLE)) {
-                                    assert(",")
-                                    parseCalc()
-                                }
-                                assert(")")
-                            }
-                            while(builder.tokenText.equals("[")) {
-                                parseCalc()
-                                assert("]")
-                                if(isNext(KatajaTokenTypes.SPECIAL)) assert(KatajaTokenTypes.SPECIAL)
-                            }
-                            if(builder.tokenText.equals(".")){
-                                assert(KatajaTokenTypes.IDENTIFIER)
-                                parseCall()
-                            }else if(!builder.tokenText.equals(")") && !builder.tokenText.equals("]")) builder.error("Illegal argument")
-                        }else if(builder.tokenText.equals(".")){
-                            assert(KatajaTokenTypes.IDENTIFIER)
-                            parseCall()
-                        }else if(builder.tokenText.equals("[")){
-                            if(isNext(KatajaTokenTypes.SPECIAL)){
-                                assert(KatajaTokenTypes.SPECIAL)
-                                if(builder.tokenText.equals("]")){
-                                    while(isNext(KatajaTokenTypes.SPECIAL)){
-                                        assert("[")
-                                        assert("]")
-                                    }
-                                    assert(KatajaTokenTypes.IDENTIFIER)
-                                    assert("=")
-                                    parseCall()
-                                    assertEnd()
-                                    return
-                                }else if(builder.tokenText.equals("(")){
-                                    parseCalc()
-                                    assert(")")
-                                    if(isNext(KatajaTokenTypes.OPERATOR)){
-                                        assert(KatajaTokenTypes.OPERATOR)
-                                        parseCalc()
-                                    }
-                                    assert("]")
-                                    while(isNext(KatajaTokenTypes.SPECIAL)){
-                                        assert(KatajaTokenTypes.SPECIAL)
-                                        if(builder.tokenText.equals("[")){
-                                            parseCalc()
-                                            assert("]")
-                                        }else if (builder.tokenText.equals(".")){
-                                            assert(KatajaTokenTypes.IDENTIFIER)
-                                            parseCall()
-                                            break
-                                        }else{
-                                            builder.error("Illegal argument")
-                                            break
-                                        }
-                                    }
-                                }else builder.error("Illegal argument")
-                            }else{
-                                while(builder.tokenText.equals("[")) {
-                                    parseCalc()
-                                    assert("]")
-                                    if(isNext(KatajaTokenTypes.SPECIAL)) assert(KatajaTokenTypes.SPECIAL)
-                                }
-                                if(builder.tokenText.equals(".")){
-                                    assert(KatajaTokenTypes.IDENTIFIER)
-                                    parseCall()
-                                }else if(!builder.tokenText.equals("]")) builder.error("Illegal argument")
-                            }
-                        }else{
-                            builder.error("Illegal argument")
-                            assertEnd()
-                            return
-                        }
-
-                        if(hasNext()){
-                            assert("=")
-                            parseCalc()
-                        }
-                    }else{
-                        if(isNext(KatajaTokenTypes.IDENTIFIER)){
-                            assert(KatajaTokenTypes.IDENTIFIER)
-                            assert("=")
-                            parseCalc()
-                        }else{
-                            assert("=")
-                            parseCalc()
-                        }
-                    }
-                }
-            }
-        }
-
-        assertEnd()
-    }
-
-    private fun parseWhile(){
-        parseCalc()
-        if(builder.tokenText.equals("->")){
-            parseStatement()
-        }else{
-            assert("{")
-            while(!isNext(KatajaTokenTypes.SPECIAL)){
-                if(isNext(KatajaTokenTypes.NEW_LINE)) next()
-                else{
-                    if(!hasNext()){
-                        builder.error("Expected }")
-                        return
-                    }
-                    parseStatement()
-                }
-            }
-            assert("}")
-        }
-    }
-
-    private fun parseIf(){
-        parseCalc()
-        if(builder.tokenText.equals("->")) parseStatement()
-        else parseContent()
-
-        if(hasNext()){
-            assert("else")
-            if(isNext(KatajaTokenTypes.IDENTIFIER)) assert("if")
-            parseIf()
-        }
-    }
-
-    private fun parseSwitch(){
-        parseCalc()
-        assert("{")
-        while(!isNext(KatajaTokenTypes.SPECIAL)){
-            if(isNext(KatajaTokenTypes.NEW_LINE)) next()
-            else{
-                if(!hasNext()){
-                    builder.error("Expected }")
-                    return
-                }
-                assert(KatajaTokenTypes.KEYWORD)
-                if(builder.tokenText.equals("case")) parseCalcArg()
-                else if(!builder.tokenText.equals("default")) builder.error("Illegal argument")
-
-                if(isNext(KatajaTokenTypes.OPERATOR)){
-                    assert("->")
-                    parseStatement()
-                }else parseContent()
-            }
-        }
-        assert("}")
-    }
-
-    private fun parseCalc(){
-        parseCalcArg()
-
-        while(isNext(KatajaTokenTypes.OPERATOR)){
-            assert(KatajaTokenTypes.OPERATOR)
-            if(builder.tokenText.equals("->")) return
-            parseCalcArg()
-        }
-    }
-
-    private fun parseCalcArg(){
-        if(isNext(KatajaTokenTypes.SPECIAL)){
-            assert("(")
-            parseCalc()
-            assert(")")
-        }else{
-            if(isNext(KatajaTokenTypes.OPERATOR)) assert(KatajaTokenTypes.OPERATOR)
-            next()
-            when(builder.tokenType){
-                KatajaTokenTypes.NUMBER, KatajaTokenTypes.CHAR, KatajaTokenTypes.STRING -> {}
-                KatajaTokenTypes.KEYWORD -> {
-                    if(!setOf("true", "false", "null").contains(builder.tokenText)) builder.error("Illegal argument")
-                }
-                KatajaTokenTypes.IDENTIFIER -> parseCall()
-                else -> builder.error("Illegal argument")
-            }
-        }
-    }
-
-    private fun parseCall(){
-        while(isNext(KatajaTokenTypes.SPECIAL)){
-            assert(KatajaTokenTypes.SPECIAL)
-            if(builder.tokenText.equals("(")){
-                if(isNext(KatajaTokenTypes.SPECIAL)) assert(")")
-                else{
-                    parseCalc()
-                    while(isNext(KatajaTokenTypes.SINGLE)){
-                        assert(",")
-                        parseCalc()
-                    }
-                    assert(")")
-                    if(isNext(KatajaTokenTypes.SPECIAL)) assert(KatajaTokenTypes.SPECIAL)
-                }
-            }
-            while(builder.tokenText.equals("[")) {
-                parseCalc()
-                assert("]")
-                if(isNext(KatajaTokenTypes.SPECIAL)) assert(KatajaTokenTypes.SPECIAL)
-            }
-
-            if(builder.tokenText.equals(".")){
-                assert(KatajaTokenTypes.IDENTIFIER)
-            }else if(!builder.tokenText.equals(")") && !builder.tokenText.equals("]")) builder.error("Illegal argument")
-        }
-    }
 
     private fun parseDataType(){
         if(isNext(KatajaTokenTypes.KEYWORD)){
@@ -485,17 +258,24 @@ class KatajaPsiParser: PsiParser {
 
     private fun parseContent(){
         assert("{")
-        while(!isNext(KatajaTokenTypes.SPECIAL)){
+        var i = 1
+        while(i > 0){
             if(isNext(KatajaTokenTypes.NEW_LINE)) next()
-            else{
+            else if(isNext(KatajaTokenTypes.SPECIAL)){
+                if(builder.tokenText.equals("{")) i++
+                else if(builder.tokenText.equals("}")) i--
+            }else{
                 if(!hasNext()){
                     builder.error("Expected }")
                     return
                 }
-                parseStatement()
             }
         }
         assert("}")
+    }
+
+    private fun toEndOfLine(){
+        while(hasNext() && !isNext(KatajaTokenTypes.NEW_LINE)) next()
     }
 
     private fun assertEnd(){

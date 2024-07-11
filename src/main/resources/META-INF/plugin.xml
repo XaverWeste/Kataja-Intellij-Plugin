@@ -41,5 +41,8 @@
         <completion.contributor
                 language="Kataja"
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaCompletionContributor"/>
+        <annotator
+                language="Kataja"
+                implementationClass="com.github.ktj.katajaintellijplugin.KatajaAnnotator"/>
     </extensions>
 </idea-plugin>
