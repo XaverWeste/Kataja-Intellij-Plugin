@@ -21,7 +21,7 @@ class KatajaPsiParser: PsiParser {
                 when(builder.tokenText){
                     "use" -> parseUse()
                     "public", "private", "protected", "const", "final", "synchronised", "abstract", "static" -> parseMod(true)
-                    "int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> parseMethodOrField(false)
+                    //"int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> parseMethodOrField(false)
                     "type" -> parseType()
                     "data" -> parseData()
                     "interface" -> parseInterface()
@@ -30,10 +30,7 @@ class KatajaPsiParser: PsiParser {
                         marker.done(type)
                         return builder.treeBuilt
                     }
-                    else -> {
-                        if(builder.tokenType == KatajaTokenTypes.IDENTIFIER) parseMethodOrField(false)
-                        else builder.error("Illegal type")
-                    }
+                    else -> toEndOfLine()
                 }
             }
             skipWhitespace()
@@ -115,10 +112,10 @@ class KatajaPsiParser: PsiParser {
                     parseClass()
                     return
                 }
-                "int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> {
-                    parseMethodOrField(false)
-                    return
-                }
+                //"int", "short", "long", "boolean", "byte", "char", "float", "double", "void" -> {
+                //    parseMethodOrField(false)
+                //    return
+                //}
                 "public", "private", "protected" -> {
                     if(acc) builder.error("Expected modifier")
                     acc = true
@@ -127,7 +124,7 @@ class KatajaPsiParser: PsiParser {
             }
         }
 
-        parseMethodOrField(true)
+        //parseMethodOrField(true)
     }
 
     private fun parseType(){

@@ -9,6 +9,8 @@ import javax.swing.Icon
 
 class KatajaFileIconProvider: FileIconProvider {
     override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
+        if(!file.extension.equals("ktj")) return null
+
         val fileContent = PsiManager.getInstance(project!!).findFile(file)?.text
         var type = 0
 
@@ -33,6 +35,7 @@ class KatajaFileIconProvider: FileIconProvider {
         }
 
         return when(type){
+            0 -> AllIcons.Nodes.Static
             1 -> AllIcons.Nodes.Class
             2 -> AllIcons.Nodes.Type
             3 -> AllIcons.Nodes.AnonymousClass
