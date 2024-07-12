@@ -44,5 +44,6 @@
         <annotator
                 language="Kataja"
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaAnnotator"/>
+        <!--<fileIconProvider implementation="com.github.ktj.katajaintellijplugin.KatajaFileIconProvider"/>-->
     </extensions>
 </idea-plugin>
