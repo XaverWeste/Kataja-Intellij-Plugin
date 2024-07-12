@@ -37,7 +37,7 @@
                 implementation="com.github.ktj.katajaintellijplugin.KatajaColorSettingsPage"/>
         <lang.parserDefinition
                 language="Kataja"
-                implementationClass="com.github.ktj.katajaintellijplugin.KatajaParser"/>
+                implementationClass="com.github.ktj.katajaintellijplugin.KatajaParserDefinition"/>
         <completion.contributor
                 language="Kataja"
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaCompletionContributor"/>

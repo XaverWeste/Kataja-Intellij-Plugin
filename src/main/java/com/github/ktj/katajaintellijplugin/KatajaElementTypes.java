@@ -4,6 +4,10 @@ import com.intellij.psi.tree.IElementType;
 
 public interface KatajaElementTypes {
     IElementType USE = new KatajaElementType("use");
+    IElementType USES = new KatajaElementType("uses");
+    IElementType FROM = new KatajaElementType("from");
+    IElementType AS = new KatajaElementType("as");
+
     IElementType DATA = new KatajaElementType("date");
     IElementType TYPE = new KatajaElementType("type");
     IElementType CLASS = new KatajaElementType("class");

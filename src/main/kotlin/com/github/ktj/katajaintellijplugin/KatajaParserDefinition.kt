@@ -14,13 +14,11 @@ import com.intellij.psi.tree.TokenSet
 
 class KatajaParserDefinition: ParserDefinition {
 
-    private val file: IFileElementType = IFileElementType(KatajaLanguage.INSTANCE)
-
     override fun createLexer(project: Project?): Lexer = KatajaLexer()
 
     override fun createParser(project: Project?): PsiParser = KatajaPsiParser()
 
-    override fun getFileNodeType(): IFileElementType = file
+    override fun getFileNodeType(): IFileElementType = FILE
 
     override fun getCommentTokens(): TokenSet = TokenSet.create(KatajaTokenTypes.COMMENT)
 
@@ -30,3 +28,5 @@ class KatajaParserDefinition: ParserDefinition {
 
     override fun createFile(fileViewProvider: FileViewProvider): PsiFile = KatajaFile(fileViewProvider)
 }
+
+val FILE: IFileElementType = IFileElementType(KatajaLanguage.INSTANCE)

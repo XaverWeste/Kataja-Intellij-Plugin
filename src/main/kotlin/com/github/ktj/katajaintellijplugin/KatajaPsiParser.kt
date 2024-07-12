@@ -42,14 +42,22 @@ class KatajaPsiParser: PsiParser {
     }
 
     private fun parseUse(){
-        if(isNext(KatajaTokenTypes.SINGLE)) assert("$")
-        assert(KatajaTokenTypes.IDENTIFIER)
+        if(isNext(KatajaTokenTypes.SINGLE)){
+            assert("$")
+            assert(KatajaTokenTypes.IDENTIFIER)
+        }else{
+            assert(KatajaTokenTypes.IDENTIFIER)
+        }
 
         if(isNext(KatajaTokenTypes.SINGLE)){
             while(isNext(KatajaTokenTypes.SINGLE)){
                 assert(",")
-                if(isNext(KatajaTokenTypes.SINGLE)) assert("$")
-                assert(KatajaTokenTypes.IDENTIFIER)
+                if(isNext(KatajaTokenTypes.SINGLE)){
+                    assert("$")
+                    assert(KatajaTokenTypes.IDENTIFIER)
+                }else{
+                    assert(KatajaTokenTypes.IDENTIFIER)
+                }
             }
 
             assert("from")
@@ -76,7 +84,7 @@ class KatajaPsiParser: PsiParser {
             }
         }
 
-        assertEnd()
+        if(builder.tokenType != KatajaTokenTypes.NEW_LINE) assertEnd()
     }
 
     private fun parseMod(allowClass: Boolean){
