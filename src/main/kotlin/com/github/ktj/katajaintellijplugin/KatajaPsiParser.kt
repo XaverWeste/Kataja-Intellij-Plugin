@@ -3,7 +3,6 @@ package com.github.ktj.katajaintellijplugin
 import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
-import com.intellij.lang.SyntaxTreeBuilder.Marker
 import com.intellij.psi.tree.IElementType
 
 class KatajaPsiParser: PsiParser {
@@ -21,10 +20,10 @@ class KatajaPsiParser: PsiParser {
                 when(builder.tokenText){
                     "use" -> parseUse()
                     "public", "private", "protected", "const", "final", "synchronised", "abstract", "static" -> parseMod(true)
-                    "type" -> parseType()
-                    "data" -> parseData()
-                    "interface" -> parseInterface()
-                    "class" -> parseClass()
+                    "type" -> parseType(builder.mark())
+                    "data" -> parseData(builder.mark())
+                    "interface" -> parseInterface(builder.mark())
+                    "class" -> parseClass(builder.mark())
                     null -> {
                         marker.done(type)
                         return builder.treeBuilt
@@ -44,35 +43,49 @@ class KatajaPsiParser: PsiParser {
     }
 
     private fun parseUse(){
+        val useMarker = builder.mark()
+        var marker: PsiBuilder.Marker
         if(isNext(KatajaTokenTypes.SINGLE)){
             assert("$")
+            marker = builder.mark()
             assert(KatajaTokenTypes.IDENTIFIER)
         }else{
             assert(KatajaTokenTypes.IDENTIFIER)
+            marker = builder.mark()
         }
 
         if(isNext(KatajaTokenTypes.SINGLE)){
             while(isNext(KatajaTokenTypes.SINGLE)){
                 assert(",")
+                marker.done(KatajaElementTypes.USES)
                 if(isNext(KatajaTokenTypes.SINGLE)){
                     assert("$")
+                    marker = builder.mark()
                     assert(KatajaTokenTypes.IDENTIFIER)
                 }else{
                     assert(KatajaTokenTypes.IDENTIFIER)
+                    marker = builder.mark()
                 }
             }
 
             assert("from")
+            marker.done(KatajaElementTypes.USES)
             assert(KatajaTokenTypes.IDENTIFIER)
+            marker = builder.mark()
 
             while(isNext(KatajaTokenTypes.OPERATOR)){
                 assert("/")
                 assert(KatajaTokenTypes.IDENTIFIER)
             }
+
+            builder.advanceLexer()
+            marker.done(KatajaElementTypes.FROM)
         }else{
             if(isNext(KatajaTokenTypes.KEYWORD)){
                 assert("from")
+                marker.done(KatajaElementTypes.USES)
                 assert(KatajaTokenTypes.IDENTIFIER)
+                marker = builder.mark()
             }
 
             while(isNext(KatajaTokenTypes.OPERATOR)){
@@ -82,14 +95,25 @@ class KatajaPsiParser: PsiParser {
 
             if(isNext(KatajaTokenTypes.KEYWORD)){
                 assert("as")
+                marker.done(KatajaElementTypes.FROM)
                 assert(KatajaTokenTypes.IDENTIFIER)
+                marker = builder.mark()
+                builder.advanceLexer()
+                marker.done(KatajaElementTypes.AS)
+            }else{
+                builder.advanceLexer()
+                marker.done(KatajaElementTypes.FROM)
             }
         }
 
         if(builder.tokenType != KatajaTokenTypes.NEW_LINE) assertEnd()
+        useMarker.done(KatajaElementTypes.USE)
     }
 
     private fun parseMod(allowClass: Boolean){
+        val marker = builder.mark()
+        val mod = builder.mark()
+
         var acc = false
         if(setOf("public", "private", "protected").contains(builder.tokenText)) acc = true
 
@@ -98,23 +122,27 @@ class KatajaPsiParser: PsiParser {
             when(builder.tokenText){
                 "const", "final", "synchronised", "abstract", "static" -> {}
                 "type" -> {
+                    mod.done(KatajaElementTypes.MODIFIER)
                     if(!allowClass) builder.error("Illegal statement")
-                    parseType()
+                    parseType(marker)
                     return
                 }
                 "data" -> {
+                    mod.done(KatajaElementTypes.MODIFIER)
                     if(!allowClass) builder.error("Illegal statement")
-                    parseData()
+                    parseData(marker)
                     return
                 }
                 "interface" -> {
+                    mod.done(KatajaElementTypes.MODIFIER)
                     if(!allowClass) builder.error("Illegal statement")
-                    parseInterface()
+                    parseInterface(marker)
                     return
                 }
                 "class" -> {
+                    mod.done(KatajaElementTypes.MODIFIER)
                     if(!allowClass) builder.error("Illegal statement")
-                    parseClass()
+                    parseClass(marker)
                     return
                 }
                 "public", "private", "protected" -> {
@@ -125,51 +153,70 @@ class KatajaPsiParser: PsiParser {
                 else -> builder.error("Expected modifier")
             }
         }
+        builder.advanceLexer()
+        mod.done(KatajaElementTypes.MODIFIER)
 
         while(!builder.eof() && !builder.tokenText.equals("{") && builder.tokenType != KatajaTokenTypes.NEW_LINE) builder.advanceLexer()
         if(builder.tokenText.equals("{")){
             parseContent()
             assertEnd()
         }
+        marker.done(KatajaElementTypes.NAME)
     }
 
-    private fun parseType(){
+    private fun parseType(classMarker: PsiBuilder.Marker){
         assert(KatajaTokenTypes.IDENTIFIER)
+        var marker = builder.mark()
         assert("=")
+        marker.done(KatajaElementTypes.NAME)
         assert(KatajaTokenTypes.IDENTIFIER)
+        marker = builder.mark()
         while(isNext(KatajaTokenTypes.OPERATOR)){
             assert("|")
+            marker.done(KatajaElementTypes.TYPE_VALUE)
             assert(KatajaTokenTypes.IDENTIFIER)
+            marker = builder.mark()
         }
         assertEnd()
+        marker.done(KatajaElementTypes.TYPE_VALUE)
+        classMarker.done(KatajaElementTypes.TYPE)
     }
 
-    private fun parseData(){
+    private fun parseData(classMarker: PsiBuilder.Marker){
         assert(KatajaTokenTypes.IDENTIFIER)
+        var marker = builder.mark()
         assert("=")
+        marker.done(KatajaElementTypes.NAME)
         assert("(")
         if(!isNext(KatajaTokenTypes.SPECIAL)){
             do {
-                parseDataType()
+                marker = parseDataType()
                 assert(KatajaTokenTypes.IDENTIFIER)
 
                 if (isNext(KatajaTokenTypes.SINGLE)) {
                     assert(",")
-                } else break
+                    marker.done(KatajaElementTypes.PARAMETER)
+                }else{
+                    builder.advanceLexer()
+                    marker.done(KatajaElementTypes.PARAMETER)
+                    break
+                }
             } while (true)
         }
-        assert(")")
+        if(!builder.tokenText.equals(")")) assert(")")
         assertEnd()
+        classMarker.done(KatajaElementTypes.DATA)
     }
 
-    private fun parseInterface(){
+    private fun parseInterface(classMarker: PsiBuilder.Marker){
         assert(KatajaTokenTypes.IDENTIFIER)
         assert("{")
         parseContent()
         assertEnd()
+        classMarker.done(KatajaElementTypes.NAME)
     }
 
-    private fun parseClass(){
+    private fun parseClass(classMarker: PsiBuilder.Marker){
         assert(KatajaTokenTypes.IDENTIFIER)
         if(isNext(KatajaTokenTypes.KEYWORD)){
             assert("extends")
@@ -182,23 +229,31 @@ class KatajaPsiParser: PsiParser {
         assert("{")
         parseContent()
         assertEnd()
+        classMarker.done(KatajaElementTypes.NAME)
     }
 
-    private fun parseDataType(){
+    private fun parseDataType(): PsiBuilder.Marker{
+        val marker: PsiBuilder.Marker
         if(isNext(KatajaTokenTypes.KEYWORD)){
             assert(KatajaTokenTypes.KEYWORD)
-            if(builder.tokenText.equals("const")){
-                if(isNext(KatajaTokenTypes.KEYWORD)) {
-                    assert(KatajaTokenTypes.KEYWORD)
-                    if (!setOf("void", "int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
-                }else assert(KatajaTokenTypes.IDENTIFIER)
-            }else if (!setOf("void", "int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
-        }else assert(KatajaTokenTypes.IDENTIFIER)
+            marker = builder.mark()
+            //if(builder.tokenText.equals("const")){
+            //    if(isNext(KatajaTokenTypes.KEYWORD)) {
+            //        assert(KatajaTokenTypes.KEYWORD)
+            //        if (!setOf("void", "int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
+            //    }else assert(KatajaTokenTypes.IDENTIFIER)
+            /*}else*/ if (!setOf("void", "int", "short", "long", "double", "float", "boolean", "char", "byte").contains(builder.tokenText)) builder.error("Expected type")
+        }else{
+            assert(KatajaTokenTypes.IDENTIFIER)
+            marker = builder.mark()
+        }
 
         while(isNext(KatajaTokenTypes.SPECIAL)){
             assert("[")
             assert("]")
         }
+
+        return marker
     }
 
     private fun parseContent(){
@@ -220,7 +275,10 @@ class KatajaPsiParser: PsiParser {
     }
 
     private fun assertEnd(){
-        if(!hasNext()) return
+        if(!hasNext()){
+            builder.advanceLexer()
+            return
+        }
 
         builder.advanceLexer()
         if(builder.tokenType != KatajaTokenTypes.NEW_LINE /*&& !builder.tokenText.equals(";")*/ && !builder.eof()){

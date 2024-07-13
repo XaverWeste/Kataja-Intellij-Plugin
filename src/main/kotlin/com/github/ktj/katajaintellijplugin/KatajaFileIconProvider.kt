@@ -21,19 +21,25 @@ class KatajaFileIconProvider: FileIconProvider {
             }else return KatajaIcons.FILE
         }
 
-        if(fileContent.split("type").size - 1 == 1){
-            if(type == 0) type = 2
-            else return KatajaIcons.FILE
+        if(fileContent.contains("type")) {
+            if(fileContent.split("type").size - 1 == 1){
+                if (type == 0) type = 2
+                else return KatajaIcons.FILE
+            }else return KatajaIcons.FILE
         }
 
-        if(fileContent.split("data").size - 1 == 1){
-            if(type == 0) type = 3
-            else return KatajaIcons.FILE
+        if(fileContent.contains("data")) {
+            if(fileContent.split("data").size - 1 == 1){
+                if(type == 0) type = 3
+                else return KatajaIcons.FILE
+            }else return KatajaIcons.FILE
         }
 
-        if(fileContent.split("interface").size - 1 == 1){
-            if(type == 0) type = 4
-            else return KatajaIcons.FILE
+        if(fileContent.contains("interface")) {
+            if(fileContent.split("interface").size - 1 == 1){
+                if(type == 0) type = 4
+                else return KatajaIcons.FILE
+            }else return KatajaIcons.FILE
         }
 
         return when(type){
