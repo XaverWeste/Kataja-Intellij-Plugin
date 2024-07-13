@@ -14,9 +14,11 @@ class KatajaFileIconProvider: FileIconProvider {
         val fileContent = PsiManager.getInstance(project!!).findFile(file)?.text
         var type = 0
 
-        if(fileContent!!.split("class").size - 1 == 1){
-            type = if(fileContent.split("abstract").size - 1 == 1) 5
-            else 1
+        if(fileContent!!.contains("class")){
+            if(fileContent.split("class").size - 1 == 1){
+                type = if (fileContent.split("abstract").size - 1 == 1) 5
+                else 1
+            }else return KatajaIcons.FILE
         }
 
         if(fileContent.split("type").size - 1 == 1){
