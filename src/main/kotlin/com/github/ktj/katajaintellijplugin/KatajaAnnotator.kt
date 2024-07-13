@@ -1,6 +1,7 @@
 package com.github.ktj.katajaintellijplugin
 
 import ai.grazie.utils.normalizeAccents
+import com.github.ktj.katajaintellijplugin.psi.KtjPsiElement
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -35,9 +36,36 @@ class KatajaAnnotator: Annotator {
         val from = filterChildren(element.children, KatajaElementTypes.FROM)
         val alias = filterChildren(element.children, KatajaElementTypes.AS)
 
-        if(alias.isNotEmpty()){
-            if(uses.containsKey(alias[0].text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, alias[0].text.trim()+" is already defined").range(alias[0]).create()
-            else uses[alias[0].text.trim()] = ""
+        val path = deleteWhiteSpace(from[0].text).replace("/", ".")
+
+        if(use.isEmpty()){
+            if(!classExist(path)) holder.newAnnotation(HighlightSeverity.ERROR, "Unable to find Class $path").range(from[0].lastChild).create()
+            else if(uses.containsValue(path)) holder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Class $path is already used").range(from[0]).create()
+
+            if(alias.isNotEmpty()){
+                if(uses.containsKey(alias[0].text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, alias[0].text.trim()+" is already defined").range(alias[0]).create()
+                else uses[alias[0].text.trim()] = path
+            }else{
+                val name = path.split(".")[path.split(".").size - 1]
+
+                if(uses.containsKey(name)) holder.newAnnotation(HighlightSeverity.ERROR, "$name is already defined").range(from[0].lastChild).create()
+                else uses[name] = name
+            }
+        }else{
+            for(u in use){
+                if(!classExist(path+"."+u.text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, "Unable to find Class "+path+"."+u.text).range(u).create()
+                else if(uses.containsValue(path+"."+u.text.trim())) holder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Class "+path+"."+u.text+" is already used").range(u).create()
+
+                if(alias.isEmpty()){
+                    if(uses.containsKey(u.text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, u.text.trim()+" is already defined").range(u).create()
+                    else uses[u.text.trim()] = path+"."+u.text.trim()
+                }
+            }
+
+            if(alias.isNotEmpty()){
+                if(uses.containsKey(alias[0].text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, alias[0].text.trim()+" is already defined").range(alias[0]).create()
+                else uses[alias[0].text.trim()] = path+"."+use[0].text.trim()
+            }
         }
     }
 
@@ -110,6 +138,14 @@ class KatajaAnnotator: Annotator {
 
         if(uses.containsKey(name[0].text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, "Class "+name[0].text.trim()+" is already defined").range(name[0]).create()
         else uses[name[0].text.trim()] = ""
+    }
+
+    private fun classExist(path: String): Boolean{
+        try{
+            Class.forName(path)
+            return true
+        }catch(ignored: ClassNotFoundException){}
+        return false
     }
 
     private fun filterChildren(arr: Array<PsiElement>, type: IElementType): MutableList<PsiElement>{
