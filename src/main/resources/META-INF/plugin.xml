@@ -48,6 +48,9 @@
         <projectViewNodeDecorator implementation="com.github.ktj.katajaintellijplugin.file.KatajaProjectViewNodeDecorator"/>
         <fileTemplateGroup implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileTemplateProvider"/>
         <configurationType implementation="com.github.ktj.katajaintellijplugin.run.KatajaRunConfigurationType"/>
+        <moduleType
+                id="KATAJA_MODULE"
+                implementationClass="com.github.ktj.katajaintellijplugin.module.KatajaModuleType"/>
     </extensions>
 
     <actions>

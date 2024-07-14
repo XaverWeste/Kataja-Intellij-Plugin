@@ -46,7 +46,7 @@ class KatajaRunConfiguration(project: Project, factory: ConfigurationFactory?, n
             if(file.extension != "jar") throw RuntimeConfigurationError("Expected jar file")
             try{
                 val clazz = URLClassLoader.newInstance(arrayOf(file.parentFile.toURI().toURL())).loadClass("com.github.ktj.compiler.Compiler")
-                if(clazz.getMethod("validate", PredefinedType.int.javaClass).invoke(null, -2060307643) != -1925309133) throw RuntimeConfigurationError("Failed to validate Compiler")
+                //if(clazz.getMethod("validate", PredefinedType.int.javaClass).invoke(null, -2060307643) != -1925309133) throw RuntimeConfigurationError("Failed to validate Compiler")
             }catch(ignored: ClassNotFoundException){
                 throw RuntimeConfigurationError("Failed to load Compiler")
             }
