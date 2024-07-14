@@ -47,6 +47,7 @@
         <fileIconProvider implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileIconProvider"/>
         <projectViewNodeDecorator implementation="com.github.ktj.katajaintellijplugin.file.KatajaProjectViewNodeDecorator"/>
         <fileTemplateGroup implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileTemplateProvider"/>
+        <configurationType implementation="com.github.ktj.katajaintellijplugin.run.KatajaRunConfigurationType"/>
     </extensions>
 
     <actions>
