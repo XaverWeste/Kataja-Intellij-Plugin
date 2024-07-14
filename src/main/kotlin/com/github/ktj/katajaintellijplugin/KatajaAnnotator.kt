@@ -1,7 +1,5 @@
 package com.github.ktj.katajaintellijplugin
 
-import ai.grazie.utils.normalizeAccents
-import com.github.ktj.katajaintellijplugin.psi.KtjPsiElement
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -23,12 +21,16 @@ class KatajaAnnotator: Annotator {
     private fun annotateFile(element: PsiElement){
         uses = hashMapOf("String" to "java.lang.String", "Object" to "java.lang.Object")
 
-        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.TYPE)) validateName(e)
-        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.DATA)) validateName(e)
+        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.TYPE)) validateName(e, "_TYPE")
+        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.DATA)) validateName(e, "_DATA")
+        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.INTERFACE)) validateName(e, "_INTERFACE")
+        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.CLASS)) validateName(e, "_CLASS")
+        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.USE)) annotateUse(e)
 
         for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.TYPE)) annotateType(e)
         for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.DATA)) annotateData(e)
-        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.USE)) annotateUse(e)
+        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.INTERFACE)) annotateInterface(e)
+        for(e: PsiElement in filterChildren(element.children, KatajaElementTypes.CLASS)) annotateClass(e)
     }
 
     private fun annotateUse(element: PsiElement){
@@ -74,7 +76,7 @@ class KatajaAnnotator: Annotator {
         if(modifier.size > 0){
             var const = false
             var final = false
-            for(mod in modifier[0].children){
+            for(mod in modifier){
                 when(mod.text.trim()){
                     "const" -> {
                         if(const) holder.newAnnotation(HighlightSeverity.ERROR, "Is already constant").range(mod).create()
@@ -101,8 +103,7 @@ class KatajaAnnotator: Annotator {
         if(modifier.size > 0){
             var const = false
             var final = false
-            for(mod in modifier[0].children){
-                println(mod.text)
+            for(mod in modifier){
                 when(mod.text.trim()){
                     "const" -> {
                         if(const) holder.newAnnotation(HighlightSeverity.ERROR, "Is already constant").range(mod).create()
@@ -125,6 +126,36 @@ class KatajaAnnotator: Annotator {
         }
     }
 
+    private fun annotateInterface(element: PsiElement){
+
+    }
+
+    private fun annotateClass(element: PsiElement){
+        var first = true
+        val extends: MutableList<String> = mutableListOf()
+
+        for(e in filterChildren(element.children, KatajaElementTypes.EXTENDS)){
+            if(first){
+                if(!validateType(e.text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, "Unknown type").range(e).create()
+                extends.add(e.text.trim())
+                first = false
+            }else{
+                if(!uses.containsKey(e.text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, "Unknown type").range(e).create()
+                else if(extends.contains(e.text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, "Class is already extended").range(e).create()
+                else{
+                    if(uses[e.text.trim()]!!.startsWith("_")){
+                        if(!uses[e.text.trim()].equals("_INTERFACE")) holder.newAnnotation(HighlightSeverity.ERROR, "Expected Interface").range(e).create()
+                    }else{
+                        try{
+                            if(!Class.forName(uses[e.text.trim()]).isInterface) holder.newAnnotation(HighlightSeverity.ERROR, "Expected Interface").range(e).create()
+                        }catch(ignored: ClassNotFoundException){}
+                    }
+                    extends.add(e.text.trim())
+                }
+            }
+        }
+    }
+
     private fun validateType(type: String): Boolean{
         if(type.contains("[")) return validateType(type.split("[")[0])
         else{
@@ -133,11 +164,11 @@ class KatajaAnnotator: Annotator {
         }
     }
 
-    private fun validateName(element: PsiElement){
+    private fun validateName(element: PsiElement, type: String){
         val name = filterChildren(element.children, KatajaElementTypes.NAME)
 
         if(uses.containsKey(name[0].text.trim())) holder.newAnnotation(HighlightSeverity.ERROR, "Class "+name[0].text.trim()+" is already defined").range(name[0]).create()
-        else uses[name[0].text.trim()] = ""
+        else uses[name[0].text.trim()] = type
     }
 
     private fun classExist(path: String): Boolean{

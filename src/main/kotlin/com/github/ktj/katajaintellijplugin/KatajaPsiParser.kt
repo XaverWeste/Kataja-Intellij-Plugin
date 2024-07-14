@@ -11,6 +11,7 @@ class KatajaPsiParser: PsiParser {
 
     override fun parse(type: IElementType, builder: PsiBuilder): ASTNode {
         this.builder = builder
+        builder.setDebugMode(true)
 
         val marker = builder.mark()
         while(builder.tokenType == KatajaTokenTypes.COMMENT || builder.tokenType == KatajaTokenTypes.WHITESPACE) builder.advanceLexer()
@@ -47,8 +48,8 @@ class KatajaPsiParser: PsiParser {
         var marker: PsiBuilder.Marker
         if(isNext(KatajaTokenTypes.SINGLE)){
             assert("$")
-            marker = builder.mark()
             assert(KatajaTokenTypes.IDENTIFIER)
+            marker = builder.mark()
         }else{
             assert(KatajaTokenTypes.IDENTIFIER)
             marker = builder.mark()
@@ -60,8 +61,8 @@ class KatajaPsiParser: PsiParser {
                 marker.done(KatajaElementTypes.USES)
                 if(isNext(KatajaTokenTypes.SINGLE)){
                     assert("$")
-                    marker = builder.mark()
                     assert(KatajaTokenTypes.IDENTIFIER)
+                    marker = builder.mark()
                 }else{
                     assert(KatajaTokenTypes.IDENTIFIER)
                     marker = builder.mark()
@@ -112,7 +113,7 @@ class KatajaPsiParser: PsiParser {
 
     private fun parseMod(allowClass: Boolean){
         val marker = builder.mark()
-        val mod = builder.mark()
+        var mod = builder.mark()
 
         var acc = false
         if(setOf("public", "private", "protected").contains(builder.tokenText)) acc = true
@@ -120,8 +121,12 @@ class KatajaPsiParser: PsiParser {
         while(isNext(KatajaTokenTypes.KEYWORD)){
             assert(KatajaTokenTypes.KEYWORD)
             when(builder.tokenText){
-                "const", "final", "synchronised", "abstract", "static" -> {}
+                "const", "final", "synchronised", "abstract", "static" -> {
+                    mod.done(KatajaElementTypes.MODIFIER)
+                    mod = builder.mark()
+                }
                 "type" -> {
+                    mod.done(KatajaElementTypes.MODIFIER)
                     mod.done(KatajaElementTypes.MODIFIER)
                     if(!allowClass) builder.error("Illegal statement")
                     parseType(marker)
@@ -146,6 +151,8 @@ class KatajaPsiParser: PsiParser {
                     return
                 }
                 "public", "private", "protected" -> {
+                    mod.done(KatajaElementTypes.MODIFIER)
+                    mod = builder.mark()
                     if(acc) builder.error("Expected modifier")
                     acc = true
                 }
@@ -210,26 +217,37 @@ class KatajaPsiParser: PsiParser {
 
     private fun parseInterface(classMarker: PsiBuilder.Marker){
         assert(KatajaTokenTypes.IDENTIFIER)
+        var marker = builder.mark()
         assert("{")
+        marker.done(KatajaElementTypes.NAME)
         parseContent()
         assertEnd()
-        classMarker.done(KatajaElementTypes.NAME)
+        classMarker.done(KatajaElementTypes.INTERFACE)
     }
 
     private fun parseClass(classMarker: PsiBuilder.Marker){
         assert(KatajaTokenTypes.IDENTIFIER)
+        var marker = builder.mark()
         if(isNext(KatajaTokenTypes.KEYWORD)){
             assert("extends")
+            marker.done(KatajaElementTypes.NAME)
             assert(KatajaTokenTypes.IDENTIFIER)
+            marker = builder.mark()
             while(isNext(KatajaTokenTypes.SINGLE)){
                 assert(",")
+                marker.done(KatajaElementTypes.EXTENDS)
                 assert(KatajaTokenTypes.IDENTIFIER)
+                marker = builder.mark()
             }
+            assert("{")
+            marker.done(KatajaElementTypes.EXTENDS)
+        }else{
+            assert("{")
+            marker.done(KatajaElementTypes.NAME)
         }
-        assert("{")
         parseContent()
         assertEnd()
-        classMarker.done(KatajaElementTypes.NAME)
+        classMarker.done(KatajaElementTypes.CLASS)
     }
 
     private fun parseDataType(): PsiBuilder.Marker{

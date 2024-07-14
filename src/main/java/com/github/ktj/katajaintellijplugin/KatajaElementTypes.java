@@ -19,4 +19,5 @@ public interface KatajaElementTypes {
     IElementType TYPE_VALUE = new KatajaElementType("type value");
     IElementType PARAMETER = new KatajaElementType("parameter");
     IElementType MODIFIER = new KatajaElementType("modifier");
+    IElementType EXTENDS = new KatajaElementType("extends");
 }
