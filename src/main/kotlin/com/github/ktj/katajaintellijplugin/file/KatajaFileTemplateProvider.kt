@@ -1,5 +1,6 @@
-package com.github.ktj.katajaintellijplugin
+package com.github.ktj.katajaintellijplugin.file
 
+import com.github.ktj.katajaintellijplugin.KatajaIcons
 import com.intellij.icons.AllIcons
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor

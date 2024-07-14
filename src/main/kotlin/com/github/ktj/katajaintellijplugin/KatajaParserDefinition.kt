@@ -1,5 +1,6 @@
 package com.github.ktj.katajaintellijplugin
 
+import com.github.ktj.katajaintellijplugin.file.KatajaFile
 import com.github.ktj.katajaintellijplugin.psi.PsiFactory
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition

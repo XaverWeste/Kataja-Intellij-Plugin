@@ -44,13 +44,13 @@
         <annotator
                 language="Kataja"
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaAnnotator"/>
-        <fileIconProvider implementation="com.github.ktj.katajaintellijplugin.KatajaFileIconProvider"/>
-        <projectViewNodeDecorator implementation="com.github.ktj.katajaintellijplugin.KatajaProjectViewNodeDecorator"/>
-        <fileTemplateGroup implementation="com.github.ktj.katajaintellijplugin.KatajaFileTemplateProvider"/>
+        <fileIconProvider implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileIconProvider"/>
+        <projectViewNodeDecorator implementation="com.github.ktj.katajaintellijplugin.file.KatajaProjectViewNodeDecorator"/>
+        <fileTemplateGroup implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileTemplateProvider"/>
     </extensions>
 
     <actions>
-        <action id="KatajaNewFileAction" class="com.github.ktj.katajaintellijplugin.KatajaNewFileAction"
+        <action id="KatajaNewFileAction" class="com.github.ktj.katajaintellijplugin.file.KatajaNewFileAction"
                 text="Kataja File" description="Create a new Kataja file" icon="com.github.ktj.katajaintellijplugin.KatajaIcons.FILE">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
