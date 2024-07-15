@@ -1,6 +1,6 @@
 package com.github.ktj.katajaintellijplugin.file
 
-import com.github.ktj.katajaintellijplugin.KatajaIcons
+import com.github.ktj.katajaintellijplugin.language.KatajaIcons
 import com.intellij.icons.AllIcons
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.actions.CreateFromTemplateAction

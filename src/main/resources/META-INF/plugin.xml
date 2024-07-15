@@ -26,7 +26,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileType
                 name="Kataja File"
-                implementationClass="com.github.ktj.katajaintellijplugin.KatajaLanguageFileType"
+                implementationClass="com.github.ktj.katajaintellijplugin.language.KatajaLanguageFileType"
                 fieldName="INSTANCE"
                 language="Kataja"
                 extensions="ktj"/>
@@ -47,15 +47,16 @@
         <fileIconProvider implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileIconProvider"/>
         <projectViewNodeDecorator implementation="com.github.ktj.katajaintellijplugin.file.KatajaProjectViewNodeDecorator"/>
         <fileTemplateGroup implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileTemplateProvider"/>
-        <configurationType implementation="com.github.ktj.katajaintellijplugin.run.KatajaRunConfigurationType"/>
-        <moduleType
+        <!--<configurationType implementation="com.github.ktj.katajaintellijplugin.run.KatajaRunConfigurationType"/>-->
+        <!--<sdkType implementation="com.github.ktj.katajaintellijplugin.language.KatajaSdkType"/>-->
+        <!--<moduleType
                 id="KATAJA_MODULE"
-                implementationClass="com.github.ktj.katajaintellijplugin.module.KatajaModuleType"/>
+                implementationClass="com.github.ktj.katajaintellijplugin.module.KatajaModuleType"/>-->
     </extensions>
 
     <actions>
         <action id="KatajaNewFileAction" class="com.github.ktj.katajaintellijplugin.file.KatajaNewFileAction"
-                text="Kataja File" description="Create a new Kataja file" icon="com.github.ktj.katajaintellijplugin.KatajaIcons.FILE">
+                text="Kataja File" description="Create a new Kataja file" icon="com.github.ktj.katajaintellijplugin.language.KatajaIcons.FILE">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
     </actions>

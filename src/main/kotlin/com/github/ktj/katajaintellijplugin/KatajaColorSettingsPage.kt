@@ -1,5 +1,6 @@
 package com.github.ktj.katajaintellijplugin
 
+import com.github.ktj.katajaintellijplugin.language.KatajaIcons
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor

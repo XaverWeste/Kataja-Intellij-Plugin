@@ -16,7 +16,7 @@ class KatajaProjectViewNodeDecorator: ProjectViewNodeDecorator {
     private fun isInKatajaFolder(file: KatajaFile): Boolean{
         var folder: VirtualFile? = file.virtualFile.parent
         while(folder != null){
-            if(folder.name == "kataja") return true
+            if(folder.name == "kataja" || folder.name == "src") return true
             folder = folder.parent
         }
         return false

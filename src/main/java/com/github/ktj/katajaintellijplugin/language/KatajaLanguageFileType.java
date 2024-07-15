@@ -1,4 +1,4 @@
-package com.github.ktj.katajaintellijplugin;
+package com.github.ktj.katajaintellijplugin.language;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.util.NlsContexts;
