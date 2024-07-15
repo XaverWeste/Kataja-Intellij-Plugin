@@ -3,7 +3,8 @@ Intellij Plugin to add Support for Kataja Programming Language
 
 ### Features
 - .ktj File type support
-- Simple Syntax Highlighting
+- Syntax Highlighting
+- File Structure Parsing and error highlighting
 - Color Settings Page
 
 ## Latest Build
