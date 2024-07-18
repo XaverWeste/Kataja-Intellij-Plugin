@@ -26,8 +26,9 @@ class KatajaNewFileAction: CreateFromTemplateAction<PsiFile>("Kataja File", "new
         builder.setTitle("New Kataja File")
             .addKind("File", KatajaIcons.FILE, "Kataja File")
             .addKind("Class", AllIcons.Nodes.Class, "Kataja Class")
+            .addKind("Object", AllIcons.Nodes.AnonymousClass, "Kataja Object")
             .addKind("Interface", AllIcons.Nodes.Interface, "Kataja Interface")
-            .addKind("Data", AllIcons.Nodes.AnonymousClass, "Kataja Data")
+            .addKind("Data", AllIcons.Nodes.ModelClass, "Kataja Data")
     }
 
     override fun getActionName(dir: PsiDirectory?, newName: String, templateName: String?): String {

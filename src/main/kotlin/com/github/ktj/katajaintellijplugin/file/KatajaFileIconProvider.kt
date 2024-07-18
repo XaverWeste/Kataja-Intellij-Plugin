@@ -31,6 +31,13 @@ class KatajaFileIconProvider: FileIconProvider {
 
         if(fileContent.contains("data")) {
             if(fileContent.split("data").size - 1 == 1){
+                if(type == 0) type = 6
+                else return KatajaIcons.FILE
+            }else return KatajaIcons.FILE
+        }
+
+        if(fileContent.contains("object")) {
+            if(fileContent.split("object").size - 1 == 1){
                 if(type == 0) type = 3
                 else return KatajaIcons.FILE
             }else return KatajaIcons.FILE
@@ -50,6 +57,7 @@ class KatajaFileIconProvider: FileIconProvider {
             3 -> AllIcons.Nodes.AnonymousClass
             4 -> AllIcons.Nodes.Interface
             5 -> AllIcons.Nodes.AbstractClass
+            6 -> AllIcons.Nodes.ModelClass
             else -> KatajaIcons.FILE
         }
     }
