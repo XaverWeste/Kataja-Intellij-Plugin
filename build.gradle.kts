@@ -10,6 +10,7 @@ version = "1.0"
 sourceSets {
     main {
         java.srcDirs("src/main/java")
+
     }
 }
 
