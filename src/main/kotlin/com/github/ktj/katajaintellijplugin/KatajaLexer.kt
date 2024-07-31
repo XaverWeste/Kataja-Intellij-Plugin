@@ -6,10 +6,57 @@ import com.intellij.psi.tree.IElementType
 
 class KatajaLexer : Lexer() {
 
-    companion object{
-        val keywords: Set<String> = setOf("if", "else", "while", "return", "true", "false", "null", "this", "main", "class", "interface", "type", "data", "public", "private", "protected", "static", "synchronised", "abstract", "void", "short", "int", "long", "boolean", "double", "float", "byte", "char", "use", "from", "as", "const", "final", "extends", "throw", "switch", "default", "for", "in", "break", "try", "catch", "object", "do")
+    companion object {
+        val keywords: Set<String> = setOf(
+            "if",
+            "else",
+            "while",
+            "return",
+            "true",
+            "false",
+            "null",
+            "this",
+            "main",
+            "class",
+            "interface",
+            "type",
+            "data",
+            "public",
+            "private",
+            "protected",
+            "static",
+            "synchronised",
+            "abstract",
+            "void",
+            "short",
+            "int",
+            "long",
+            "boolean",
+            "double",
+            "float",
+            "byte",
+            "char",
+            "use",
+            "from",
+            "as",
+            "const",
+            "final",
+            "extends",
+            "throw",
+            "switch",
+            "default",
+            "for",
+            "in",
+            "break",
+            "try",
+            "catch",
+            "object",
+            "do",
+            "volatile",
+            "transient",
+            "strict"
+        )
     }
-    
     private lateinit var buffer: CharSequence
     private var state = 0
     private var pos: Int = -2

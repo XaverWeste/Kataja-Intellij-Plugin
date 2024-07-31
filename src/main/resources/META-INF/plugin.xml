@@ -35,15 +35,15 @@
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaSyntaxHighlighterFactory"/>
         <colorSettingsPage
                 implementation="com.github.ktj.katajaintellijplugin.KatajaColorSettingsPage"/>
-        <lang.parserDefinition
+        <!--<lang.parserDefinition
                 language="Kataja"
-                implementationClass="com.github.ktj.katajaintellijplugin.KatajaParserDefinition"/>
+                implementationClass="com.github.ktj.katajaintellijplugin.KatajaParserDefinition"/>-->
         <completion.contributor
                 language="Kataja"
                 implementationClass="com.github.ktj.katajaintellijplugin.KatajaCompletionContributor"/>
-        <annotator
+        <!--<annotator
                 language="Kataja"
-                implementationClass="com.github.ktj.katajaintellijplugin.KatajaAnnotator"/>
+                implementationClass="com.github.ktj.katajaintellijplugin.KatajaAnnotator"/>-->
         <fileIconProvider implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileIconProvider"/>
         <projectViewNodeDecorator implementation="com.github.ktj.katajaintellijplugin.file.KatajaProjectViewNodeDecorator"/>
         <fileTemplateGroup implementation="com.github.ktj.katajaintellijplugin.file.KatajaFileTemplateProvider"/>
