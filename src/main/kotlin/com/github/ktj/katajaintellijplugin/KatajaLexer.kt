@@ -54,7 +54,8 @@ class KatajaLexer : Lexer() {
             "do",
             "volatile",
             "transient",
-            "strict"
+            "strict",
+            "native"
         )
     }
     private lateinit var buffer: CharSequence
